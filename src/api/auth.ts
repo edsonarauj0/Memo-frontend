@@ -1,6 +1,4 @@
-import { httpClient } from './httpClient'
-
-const API_URL = 'http://8080/api' // ajuste para a URL real
+import { api } from './axios'
 
 export interface LoginPayload {
   email: string
@@ -8,9 +6,6 @@ export interface LoginPayload {
 }
 
 export async function login(payload: LoginPayload) {
-  return httpClient(`${API_URL}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
+  const { data } = await api.post('/login', payload)
+  return data
 }
