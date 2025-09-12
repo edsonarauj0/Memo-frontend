@@ -4,5 +4,14 @@
   "tabWidth": 2,
   "trailingComma": "es5",
   "printWidth": 100,
-  "endOfLine": "auto"
+  "endOfLine": "auto",
+  "arrowParens": "avoid",
+  "bracketSameLine": true,
+  "bracketSpacing": true,
+  "jsxBracketSameLine": false,
+  "jsxSingleQuote": false,
+  "quoteProps": "as-needed",
+  "requirePragma": false,
+  "useTabs": false,
+  "vueIndentScriptAndStyle": false
 }
