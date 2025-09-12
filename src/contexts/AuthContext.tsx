@@ -1,7 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useState, ReactNode } from 'react'
+import { createContext, useState } from 'react'
+import type { ReactNode } from 'react'
 
-interface AuthContextType {
+export interface AuthContextType {
   user: unknown
   login: (userData: unknown) => void
   logout: () => void
