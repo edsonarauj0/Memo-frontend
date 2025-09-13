@@ -7,6 +7,7 @@ import {
   getStoredAuth,
   login as authLogin,
 } from '../services/auth'
+import type { LoginResponse } from '../api/auth'
 
 export interface AuthContextType {
   user: User | null
@@ -31,6 +32,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(stored.user)
       setAccessToken(stored.accessToken)
       setRefreshToken(stored.refreshToken)
+    }
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<LoginResponse | null>).detail
+      if (detail) {
+        setUser(detail.user)
+        setAccessToken(detail.accessToken)
+        setRefreshToken(detail.refreshToken)
+      } else {
+        setUser(null)
+        setAccessToken(null)
+        setRefreshToken(null)
+      }
+    }
+    window.addEventListener('auth:changed', handler as EventListener)
+    return () => {
+      window.removeEventListener('auth:changed', handler as EventListener)
     }
   }, [])
 
