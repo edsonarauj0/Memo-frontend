@@ -3,7 +3,7 @@ import axios, {
   type AxiosRequestConfig,
   type AxiosResponse,
 } from 'axios'
-import { clearAuth, updateAccessToken } from '../lib/auth'
+import { clearToken, saveToken } from '../lib/auth'
 
 interface RequestOptions {
   url: string
@@ -55,13 +55,13 @@ class AxiosClient {
             )
             const newToken = res.data.accessToken
             this.setAuthTokens(newToken, this.refreshToken)
-            updateAccessToken(newToken)
+            saveToken(newToken)
             originalRequest.headers = originalRequest.headers ?? {}
             originalRequest.headers.Authorization = `Bearer ${newToken}`
             return this.axiosInstance(originalRequest)
           } catch (refreshError) {
             this.setAuthTokens(null, null)
-            clearAuth()
+            clearToken()
             return Promise.reject(refreshError)
           }
         }
