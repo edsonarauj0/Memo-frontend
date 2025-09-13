@@ -4,24 +4,24 @@ import {
   type LoginPayload,
   type LoginResponse,
 } from '../api/auth'
-import { clearAuth, loadAuth, saveAuth } from '../lib/auth'
+import { clearToken, loadToken, saveToken } from '../lib/auth'
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const data = await loginApi(payload)
-  httpClient.setAuthTokens(data.accessToken, data.refreshToken)
-  saveAuth(data)
+  httpClient.setAuthTokens(data.accessToken, null)
+  saveToken(data.accessToken)
   return data
 }
 
-export function getStoredAuth(): LoginResponse | null {
-  const data = loadAuth()
-  if (data) {
-    httpClient.setAuthTokens(data.accessToken, data.refreshToken)
+export function getStoredToken(): string | null {
+  const token = loadToken()
+  if (token) {
+    httpClient.setAuthTokens(token, null)
   }
-  return data
+  return token
 }
 
-export function clearStoredAuth() {
-  clearAuth()
+export function clearStoredToken() {
+  clearToken()
   httpClient.setAuthTokens(null, null)
 }
