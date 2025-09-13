@@ -10,6 +10,7 @@ export default function Login() {
   const authContext = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
+    debugger
     e.preventDefault();
     await authContext.login({ email, password });
   };
