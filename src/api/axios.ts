@@ -1,13 +1,193 @@
-import axios from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 
-export const api = axios.create({
-  baseURL: 'http://8080/api', // ajuste para a URL real
-})
+interface RequestOptions {
+  url: string
+  data?: unknown
+  params?: Record<string, unknown>
+  extraHeaders?: Record<string, string>
+}
 
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+class AxiosClient {
+  private static instance: AxiosClient
+
+  private axiosInstance: AxiosInstance
+
+  private authToken: string | null = null
+
+  private constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: import.meta.env.VITE_API_URL ?? 'http://8080/api',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    this.axiosInstance.interceptors.request.use(config => {
+      if (this.authToken) {
+        config.headers = config.headers ?? {}
+        config.headers.Authorization = `Bearer ${this.authToken}`
+      }
+      return config
+    })
+
+    this.axiosInstance.interceptors.response.use(
+      response => response,
+      error => Promise.reject(error),
+    )
   }
-  return config
-})
+
+  public static getInstance(): AxiosClient {
+    if (!AxiosClient.instance) {
+      AxiosClient.instance = new AxiosClient()
+    }
+    return AxiosClient.instance
+  }
+
+  public setAuthToken(token: string | null): void {
+    this.authToken = token
+  }
+
+  private mergeHeaders(extraHeaders?: Record<string, string>) {
+    return { ...(extraHeaders || {}) }
+  }
+
+  public async get<T = unknown>({ url, params, extraHeaders }: RequestOptions): Promise<T> {
+    try {
+      const res: AxiosResponse<T> = await this.axiosInstance.get(url, {
+        params,
+        headers: this.mergeHeaders(extraHeaders),
+      })
+      return res.data
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  public async post<T = unknown>({
+    url,
+    data,
+    params,
+    extraHeaders,
+  }: RequestOptions): Promise<T> {
+    try {
+      const res: AxiosResponse<T> = await this.axiosInstance.post(url, data, {
+        params,
+        headers: this.mergeHeaders(extraHeaders),
+      })
+      return res.data
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  public async put<T = unknown>({
+    url,
+    data,
+    params,
+    extraHeaders,
+  }: RequestOptions): Promise<T> {
+    try {
+      const res: AxiosResponse<T> = await this.axiosInstance.put(url, data, {
+        params,
+        headers: this.mergeHeaders(extraHeaders),
+      })
+      return res.data
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  public async patch<T = unknown>({
+    url,
+    data,
+    params,
+    extraHeaders,
+  }: RequestOptions): Promise<T> {
+    try {
+      const res: AxiosResponse<T> = await this.axiosInstance.patch(url, data, {
+        params,
+        headers: this.mergeHeaders(extraHeaders),
+      })
+      return res.data
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  public async delete<T = unknown>({
+    url,
+    params,
+    extraHeaders,
+  }: RequestOptions): Promise<T> {
+    try {
+      const res: AxiosResponse<T> = await this.axiosInstance.delete(url, {
+        params,
+        headers: this.mergeHeaders(extraHeaders),
+      })
+      return res.data
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  public async getBlob({
+    url,
+    params,
+    extraHeaders,
+  }: RequestOptions): Promise<Blob> {
+    try {
+      const res = await this.axiosInstance.get(url, {
+        params,
+        headers: this.mergeHeaders(extraHeaders),
+        responseType: 'blob',
+      })
+      return res.data
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  public async postBlob({
+    url,
+    data,
+    params,
+    extraHeaders,
+  }: RequestOptions): Promise<Blob> {
+    try {
+      const res = await this.axiosInstance.post(url, data, {
+        params,
+        headers: this.mergeHeaders(extraHeaders),
+        responseType: 'blob',
+      })
+      return res.data
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  protected handleError(error: unknown): never {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        const responseData = error.response.data
+        if (
+          typeof responseData === 'object' &&
+          responseData !== null &&
+          'message' in (responseData as Record<string, unknown>)
+        ) {
+          throw new Error(String((responseData as Record<string, unknown>).message))
+        }
+        throw new Error(JSON.stringify(responseData))
+      } else if (error.request) {
+        throw new Error('No response received from the server')
+      } else {
+        throw new Error('Error setting up request')
+      }
+    }
+    throw new Error('An unexpected error occurred')
+  }
+}
+
+export default AxiosClient.getInstance()
+
+export type { RequestOptions }
+

@@ -1,4 +1,4 @@
-import { api } from './axios'
+import httpClient from './axios'
 
 export interface LoginPayload {
   email: string
@@ -6,6 +6,8 @@ export interface LoginPayload {
 }
 
 export async function login(payload: LoginPayload) {
-  const { data } = await api.post('/login', payload)
-  return data
+  return httpClient.post<{ token: string }>({
+    url: '/login',
+    data: payload,
+  })
 }
