@@ -7,10 +7,10 @@ import { useAuth } from "../../hooks/useAuth";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const authContext = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const authContext = useAuth();
     authContext.login({ email, password });
   };
 
