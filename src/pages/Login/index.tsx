@@ -7,12 +7,17 @@ import { useAuth } from "../../hooks/useAuth";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const authContext = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    debugger
     e.preventDefault();
-    await authContext.login({ email, password });
+    setError(null);
+    try {
+      await authContext.login({ email, password });
+    } catch (err) {
+      setError((err as Error).message);
+    }
   };
 
   return (
@@ -37,6 +42,7 @@ export default function Login() {
               onChange={e => setPassword(e.target.value)}
               required
             />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button type="submit" className="w-full">Entrar</Button>
           </form>
         </CardContent>
