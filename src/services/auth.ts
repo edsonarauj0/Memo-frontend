@@ -4,29 +4,24 @@ import {
   type LoginPayload,
   type LoginResponse,
 } from '../api/auth'
-
-const STORAGE_KEY = 'auth'
+import { clearAuth, loadAuth, saveAuth } from '../lib/auth'
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const data = await loginApi(payload)
   httpClient.setAuthTokens(data.accessToken, data.refreshToken)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  saveAuth(data)
   return data
 }
 
 export function getStoredAuth(): LoginResponse | null {
-  const raw = localStorage.getItem(STORAGE_KEY)
-  if (!raw) return null
-  try {
-    const data: LoginResponse = JSON.parse(raw)
+  const data = loadAuth()
+  if (data) {
     httpClient.setAuthTokens(data.accessToken, data.refreshToken)
-    return data
-  } catch {
-    return null
   }
+  return data
 }
 
 export function clearStoredAuth() {
-  localStorage.removeItem(STORAGE_KEY)
+  clearAuth()
   httpClient.setAuthTokens(null, null)
 }
