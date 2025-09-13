@@ -10,7 +10,8 @@ import {
 
 export interface AuthContextType {
   user: User | null
-  token: string | null
+  accessToken: string | null
+  refreshToken: string | null
   login: (credentials: LoginPayload) => Promise<void>
   logout: () => void
 }
@@ -21,30 +22,36 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [token, setToken] = useState<string | null>(null)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [refreshToken, setRefreshToken] = useState<string | null>(null)
 
   useEffect(() => {
     const stored = getStoredAuth()
     if (stored) {
       setUser(stored.user)
-      setToken(stored.token)
+      setAccessToken(stored.accessToken)
+      setRefreshToken(stored.refreshToken)
     }
   }, [])
 
   const login = async (credentials: LoginPayload) => {
     const data = await authLogin(credentials)
     setUser(data.user)
-    setToken(data.token)
+    setAccessToken(data.accessToken)
+    setRefreshToken(data.refreshToken)
   }
 
   const logout = () => {
     setUser(null)
-    setToken(null)
+    setAccessToken(null)
+    setRefreshToken(null)
     clearStoredAuth()
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, accessToken, refreshToken, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )
