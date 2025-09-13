@@ -22,10 +22,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => getStoredToken())
 
   useEffect(() => {
+    // Removido o redirecionamento automático para login
     const handler = (event: Event) => {
       const detail = (event as CustomEvent<string | null>).detail
       setToken(detail)
-    }
+      }
     window.addEventListener('auth:changed', handler as EventListener)
     return () => {
       window.removeEventListener('auth:changed', handler as EventListener)
