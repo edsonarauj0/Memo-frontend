@@ -168,7 +168,7 @@ class AxiosClient {
   protected handleError(error: unknown): never {
     if (axios.isAxiosError(error)) {
       if (error.response) {
-        const responseData = error.response.data
+        const responseData = error.response.data.message
         if (
           typeof responseData === 'object' &&
           responseData !== null &&
