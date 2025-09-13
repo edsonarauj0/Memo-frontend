@@ -1,12 +1,12 @@
 import httpClient from '../api/axios'
-import { login as loginApi, LoginPayload, LoginResponse } from '../api/auth'
+import { login as loginApi, type LoginPayload, type LoginResponse } from '../api/auth'
 
 const STORAGE_KEY = 'auth'
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const data = await loginApi(payload)
   httpClient.setAuthToken(data.token)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data.user))
   return data
 }
 

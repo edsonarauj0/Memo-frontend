@@ -18,7 +18,7 @@ export interface LoginResponse {
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   return httpClient.post<LoginResponse>({
-    url: '/login',
+    url: '/auth/login',
     data: payload,
   })
 }
