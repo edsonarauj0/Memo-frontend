@@ -5,8 +5,19 @@ export interface LoginPayload {
   password: string
 }
 
-export async function login(payload: LoginPayload) {
-  return httpClient.post<{ token: string }>({
+export interface User {
+  id: string
+  name: string
+  email: string
+}
+
+export interface LoginResponse {
+  token: string
+  user: User
+}
+
+export async function login(payload: LoginPayload): Promise<LoginResponse> {
+  return httpClient.post<LoginResponse>({
     url: '/login',
     data: payload,
   })
