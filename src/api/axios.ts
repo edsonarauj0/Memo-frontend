@@ -1,4 +1,8 @@
-import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from 'axios'
 
 interface RequestOptions {
   url: string
@@ -13,6 +17,7 @@ class AxiosClient {
   private axiosInstance: AxiosInstance
 
   private authToken: string | null = null
+  private refreshToken: string | null = null
 
   private constructor() {
     this.axiosInstance = axios.create({
@@ -32,7 +37,33 @@ class AxiosClient {
 
     this.axiosInstance.interceptors.response.use(
       response => response,
-      error => Promise.reject(error),
+      async error => {
+        const originalRequest = error.config as AxiosRequestConfig & {
+          _retry?: boolean
+        }
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          this.refreshToken
+        ) {
+          originalRequest._retry = true
+          try {
+            const res = await this.axiosInstance.post<{ accessToken: string }>(
+              '/auth/refresh',
+              { refreshToken: this.refreshToken },
+            )
+            const newToken = res.data.accessToken
+            this.setAuthTokens(newToken, this.refreshToken)
+            originalRequest.headers = originalRequest.headers ?? {}
+            originalRequest.headers.Authorization = `Bearer ${newToken}`
+            return this.axiosInstance(originalRequest)
+          } catch (refreshError) {
+            this.setAuthTokens(null, null)
+            return Promise.reject(refreshError)
+          }
+        }
+        return Promise.reject(error)
+      },
     )
   }
 
@@ -43,8 +74,14 @@ class AxiosClient {
     return AxiosClient.instance
   }
 
-  public setAuthToken(token: string | null): void {
-    this.authToken = token
+  public setAuthTokens(
+    accessToken: string | null,
+    refreshToken?: string | null,
+  ): void {
+    this.authToken = accessToken
+    if (refreshToken !== undefined) {
+      this.refreshToken = refreshToken
+    }
   }
 
   private mergeHeaders(extraHeaders?: Record<string, string>) {

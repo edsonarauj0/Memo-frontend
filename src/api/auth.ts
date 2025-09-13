@@ -12,13 +12,27 @@ export interface User {
 }
 
 export interface LoginResponse {
-  token: string
+  accessToken: string
+  refreshToken: string
   user: User
+}
+
+export interface RefreshResponse {
+  accessToken: string
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   return httpClient.post<LoginResponse>({
     url: '/auth/login',
     data: payload,
+  })
+}
+
+export async function refresh(
+  refreshToken: string,
+): Promise<RefreshResponse> {
+  return httpClient.post<RefreshResponse>({
+    url: '/auth/refresh',
+    data: { refreshToken },
   })
 }
