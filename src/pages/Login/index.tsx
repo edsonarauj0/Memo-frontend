@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Input } from "../../components/ui/input";
-import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { useAuth } from "../../hooks/useAuth";
-
+import GetStartedButton from "../../components/shsfui/button/get-started-button";
+import Comp270MessageError from "../../components/comp-270";
+import { toast } from "sonner";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +17,7 @@ export default function Login() {
     try {
       await authContext.login({ email, password });
     } catch (err) {
-      setError((err as Error).message);
+      toast.warning((err as Error).message);
     }
   };
 
@@ -42,8 +43,8 @@ export default function Login() {
               onChange={e => setPassword(e.target.value)}
               required
             />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button type="submit" className="w-full">Entrar</Button>
+            {error && <Comp270MessageError message={error} />}
+            <GetStartedButton type="submit" className="w-full">Entrar</GetStartedButton>
           </form>
         </CardContent>
       </Card>
