@@ -5,25 +5,29 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
 
-import { useIsMobile } from "@/hooks/use-mobile"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+import { Button } from "./button"
+import { Input } from "./input"
+import { Separator } from "./separator"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "./sheet"
+import { Skeleton } from "./skeleton"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "./tooltip"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -73,7 +77,25 @@ const SidebarProvider = React.forwardRef<
     },
     ref
   ) => {
-    const isMobile = useIsMobile()
+    const [isMobile, setIsMobile] = React.useState(false)
+
+    React.useEffect(() => {
+      // Check if window is defined (browser environment)
+      if (typeof window !== 'undefined') {
+        const checkMobile = () => {
+          setIsMobile(window.innerWidth < 768) // 768px is the md breakpoint in Tailwind
+        }
+        
+        // Initial check
+        checkMobile()
+
+        // Add resize listener
+        window.addEventListener('resize', checkMobile)
+        
+        // Cleanup
+        return () => window.removeEventListener('resize', checkMobile)
+      }
+    }, [])
     const [openMobile, setOpenMobile] = React.useState(false)
 
     // This is the internal state of the sidebar.

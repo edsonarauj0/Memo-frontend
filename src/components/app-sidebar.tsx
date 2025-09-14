@@ -24,7 +24,6 @@ import {
   SidebarRail,
 } from "./ui/sidebar"
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",
