@@ -26,7 +26,7 @@ export function Menu({ children, ...props }: React.ComponentProps<typeof Sidebar
         <SidebarHeader>
           <ProjetoSwitcher projetos={user?.projetos?.map(projeto => ({
             id: projeto.id,
-            name: projeto.nome ?? "",
+            nome: projeto.nome ?? "",
             plan: projeto.cargo ?? "",
             logo: projeto.imagemUrl, // Replace with your actual logo component or logic
             descricao: projeto.descricao ?? "",

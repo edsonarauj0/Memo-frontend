@@ -75,8 +75,8 @@ debugger
                     <div className="flex size-6 items-center justify-center rounded-sm border">
                       <Command className="size-4 shrink-0" />
                     </div>
-                    {projeto.nome}
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                    {projeto.descricao}
+                    <DropdownMenuShortcut>⌘{projeto.id}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
