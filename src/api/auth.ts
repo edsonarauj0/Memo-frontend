@@ -6,9 +6,11 @@ export interface LoginPayload {
 }
 
 export interface User {
-  id: string
-  name: string
+  id: number
+  nome: string
+  sobrenome: string
   email: string
+  foto?: string | null
 }
 
 export interface LoginResponse {
