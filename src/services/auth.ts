@@ -15,14 +15,13 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
 }
 export async function validateToken(): Promise<boolean> {
   try {
-    debugger
     const response = await validateTokenApi()
     if (response) {
       return true
     }
     clearStoredToken()
     return false
-  } catch (error) {
+  } catch {
     // On any error (including invalid token), clear stored token
     clearStoredToken()
     return false
