@@ -1,12 +1,11 @@
 import * as React from "react"
 
 import { sidebarData } from "../config/navigation"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "../hooks/useAuth"
 
 import { NavMain } from "./nav-main"
 import { NavProjects } from "./nav-projects"
 import { NavUser } from "./nav-user"
-import { TeamSwitcher } from "./team-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -16,14 +15,23 @@ import {
   SidebarProvider,
   SidebarRail,
 } from "./ui/sidebar"
+import { ProjetoSwitcher } from "./projeto-switcher"
 
 export function Menu({ children, ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = useAuth()
+  const { user } = useAuth();
+  debugger
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" {...props}>
         <SidebarHeader>
-          <TeamSwitcher teams={sidebarData.teams} />
+          <ProjetoSwitcher projetos={user?.projetos?.map(projeto => ({
+            id: projeto.id,
+            name: projeto.nome ?? "",
+            plan: projeto.cargo ?? "",
+            logo: projeto.imagemUrl, // Replace with your actual logo component or logic
+            descricao: projeto.descricao ?? "",
+            editais: projeto.editais,
+          })) || []} />
         </SidebarHeader>
         <SidebarContent>
           <NavMain items={sidebarData.navMain} />

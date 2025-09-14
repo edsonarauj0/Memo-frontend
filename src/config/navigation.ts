@@ -17,7 +17,7 @@ export const sidebarData = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
+  projetos: [
     {
       name: "Acme Inc",
       logo: GalleryVerticalEnd,

@@ -11,6 +11,22 @@ export interface User {
   sobrenome: string
   email: string
   foto?: string | null
+  projetos: Projeto[]
+}
+
+export interface Projeto {
+  nome: string
+  descricao: string
+  description: string | null
+  role: string | null
+  notices: string | null
+  imageUrl: string | null
+  name: string | null
+  id: number
+  cargo: string | null
+  observacoes: string | null
+  editais: string | null
+  imagemUrl: string | null
 }
 
 export interface LoginResponse {

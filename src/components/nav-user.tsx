@@ -40,6 +40,7 @@ export function NavUser({
     foto?: string | null
   }
 }) {
+  debugger
   const { isMobile } = useSidebar()
   const fullName = `${user.nome} ${user.sobrenome}`
   const initials = `${user.nome.charAt(0)}${user.sobrenome.charAt(0)}`
