@@ -3,7 +3,6 @@ import Login from '../pages/Login'
 import Dashboard from '../pages/Dashboard'
 import ProtectedRoute from './ProtectedRoute'
 import { Menu } from '../components/app-sidebar'
-import { SidebarProvider } from '../components/ui/sidebar'
 
 export function AppRoutes() {
   return (
@@ -13,11 +12,9 @@ export function AppRoutes() {
         path="/"
         element={
           <ProtectedRoute>
-            <SidebarProvider>
-              <Menu>
-                <Dashboard />
-              </Menu>
-            </SidebarProvider>
+            <Menu>
+              <Dashboard />
+            </Menu>
           </ProtectedRoute>
         }
       />
