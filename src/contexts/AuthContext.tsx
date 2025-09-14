@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { LoginPayload } from '../api/auth'
@@ -6,6 +5,7 @@ import {
   clearStoredToken,
   getStoredToken,
   login as authLogin,
+  validateToken,
 } from '../services/auth'
 
 export interface AuthContextType {
@@ -22,16 +22,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => getStoredToken())
 
   useEffect(() => {
-    // Removido o redirecionamento automático para login
     const handler = (event: Event) => {
       const detail = (event as CustomEvent<string | null>).detail
       setToken(detail)
-      }
+    }
     window.addEventListener('auth:changed', handler as EventListener)
     return () => {
       window.removeEventListener('auth:changed', handler as EventListener)
     }
   }, [])
+
+  useEffect(() => {
+    debugger
+    const verify = async () => {
+      if (token) {
+        const isValid = await validateToken()
+        if (!isValid) {
+          setToken(null)
+        }
+      }
+    }
+    void verify()
+  }, [token])
 
   const login = async (credentials: LoginPayload) => {
     const data = await authLogin(credentials)

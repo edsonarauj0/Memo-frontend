@@ -36,3 +36,9 @@ export async function refresh(
     data: { refreshToken },
   })
 }
+
+export async function validateToken(): Promise<void> {
+  return httpClient.get<void>({
+    url: '/auth/validate',
+  })
+}

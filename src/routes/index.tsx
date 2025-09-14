@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import Login from '../pages/Login'
 import Dashboard from '../pages/Dashboard'
 import ProtectedRoute from './ProtectedRoute'
+import { Menu } from '../components/app-sidebar'
 
 export function AppRoutes() {
   return (
@@ -11,7 +12,9 @@ export function AppRoutes() {
         path="/"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <Menu>
+              <Dashboard />
+            </Menu>
           </ProtectedRoute>
         }
       />

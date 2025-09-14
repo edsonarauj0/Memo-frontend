@@ -1,6 +1,7 @@
 import httpClient from '../api/axios'
 import {
   login as loginApi,
+  validateToken as validateTokenApi,
   type LoginPayload,
   type LoginResponse,
 } from '../api/auth'
@@ -12,7 +13,21 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
   saveToken(data.accessToken)
   return data
 }
-
+export async function validateToken(): Promise<boolean> {
+  try {
+    debugger
+    const response = await validateTokenApi()
+    if (response) {
+      return true
+    }
+    clearStoredToken()
+    return false
+  } catch (error) {
+    // On any error (including invalid token), clear stored token
+    clearStoredToken()
+    return false
+  }
+}
 export function getStoredToken(): string | null {
   const token = loadToken()
   if (token) {
