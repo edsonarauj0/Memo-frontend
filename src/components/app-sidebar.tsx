@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { sidebarData } from "@/config/navigation"
+import { sidebarData } from "../config/navigation"
 import { useAuth } from "@/hooks/useAuth"
 
 import { NavMain } from "./nav-main"
