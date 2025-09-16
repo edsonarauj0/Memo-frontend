@@ -39,13 +39,13 @@ export function NavUser({
   user: Pick<User, "nome" | "sobrenome" | "email" | "foto">
 }) {
   const { isMobile } = useSidebar()
-  const { logout } = useAuth()
   const navigate = useNavigate()
   const fullName = `${user.nome} ${user.sobrenome}`
   const initials = `${user.nome.charAt(0)}${user.sobrenome.charAt(0)}`
+  const authContext = useAuth();
 
   const handleLogout = async () => {
-    await logout()
+    await authContext.logout()
     navigate("/login")
   }
 
@@ -89,28 +89,28 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <Sparkles />
                 Upgrade to Pro
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <CreditCard />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <Bell />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
               <LogOut />
               Log out
             </DropdownMenuItem>
