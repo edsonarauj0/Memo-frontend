@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildRefreshTokenCookie,
-  buildRefreshTokenClearingCookie,
   constants,
   createMaskedRefreshTokenCookie,
   extractMaskedTokenFromCookies,
@@ -43,20 +42,6 @@ describe('refresh token masking helpers', () => {
     expect(cookie).toContain('SameSite=Strict')
     expect(cookie).toContain('Path=/auth')
     expect(cookie).toMatch(/^memo\.rt=/)
-  })
-
-  it('builds a clearing cookie while preserving hardened attributes', () => {
-    const clearingCookie = buildRefreshTokenClearingCookie({
-      domain: 'example.com',
-    })
-
-    expect(clearingCookie).toMatch(/^memo\.rt=/)
-    expect(clearingCookie).toContain('Path=/auth')
-    expect(clearingCookie).toContain('Domain=example.com')
-    expect(clearingCookie).toContain('Max-Age=0')
-    expect(clearingCookie).toContain('HttpOnly')
-    expect(clearingCookie).toContain('Secure')
-    expect(clearingCookie).toContain('SameSite=Strict')
   })
 
   it('extracts masked token values from cookie headers', () => {

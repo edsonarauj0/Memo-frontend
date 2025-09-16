@@ -212,43 +212,6 @@ export function buildRefreshTokenCookie(
   return cookieParts.join('; ')
 }
 
-export function buildRefreshTokenClearingCookie(options: CookieOptions = {}): string {
-  const {
-    name = DEFAULT_COOKIE_NAME,
-    httpOnly = true,
-    secure = true,
-    sameSite = 'strict',
-    path = '/auth',
-    domain,
-  } = options
-
-  const cookieParts = [`${encodeURIComponent(name)}=`]
-
-  if (path) {
-    cookieParts.push(`Path=${path}`)
-  }
-
-  if (domain) {
-    cookieParts.push(`Domain=${domain}`)
-  }
-
-  cookieParts.push('Max-Age=0')
-
-  if (sameSite) {
-    cookieParts.push(`SameSite=${sameSite.charAt(0).toUpperCase()}${sameSite.slice(1).toLowerCase()}`)
-  }
-
-  if (secure) {
-    cookieParts.push('Secure')
-  }
-
-  if (httpOnly) {
-    cookieParts.push('HttpOnly')
-  }
-
-  return cookieParts.join('; ')
-}
-
 export function createMaskedRefreshTokenCookie(
   refreshToken: string,
   keyInput: KeyInput,
