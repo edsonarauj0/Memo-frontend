@@ -2,6 +2,7 @@ import httpClient from '../api/axios'
 import {
   login as loginApi,
   logout as logoutApi,
+  refreshSession as refreshSessionApi,
   validateToken as validateTokenApi,
   type LoginPayload,
   type LoginResponse,
@@ -9,33 +10,29 @@ import {
 import {
   clearAuthSession,
   loadAuthSession,
+  loadStoredUser,
   saveAuthSession,
 } from '../lib/auth'
 import type { AuthSession } from '../types/auth'
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const data = await loginApi(payload)
-  httpClient.setAuthTokens(data.accessToken, data.refreshToken)
+  httpClient.setAuthTokens(data.accessToken)
   saveAuthSession({
     accessToken: data.accessToken,
-    refreshToken: data.refreshToken,
     user: data.user,
   })
   return data
 }
 
 export async function logout(): Promise<void> {
-  const session = loadAuthSession()
-
   try {
-    if (session?.refreshToken) {
-      await logoutApi(session.refreshToken)
-    }
+    await logoutApi()
   } catch (error) {
-    console.warn('Failed to invalidate refresh token during logout', error)
+    console.warn('Failed to invalidate session during logout', error)
   } finally {
     clearAuthSession()
-    httpClient.setAuthTokens(null, null)
+    httpClient.setAuthTokens(null)
   }
 }
 
@@ -50,7 +47,34 @@ export async function validateToken(): Promise<boolean> {
 export function getStoredSession(): AuthSession | null {
   const session = loadAuthSession()
   if (session?.accessToken) {
-    httpClient.setAuthTokens(session.accessToken, session.refreshToken)
+    httpClient.setAuthTokens(session.accessToken)
   }
   return session
+}
+
+export async function restoreSession(): Promise<AuthSession | null> {
+  const user = loadStoredUser()
+  if (!user) {
+    return null
+  }
+
+  try {
+    const data = await refreshSessionApi()
+    if (!data.accessToken) {
+      return null
+    }
+
+    httpClient.setAuthTokens(data.accessToken)
+    const session: AuthSession = {
+      accessToken: data.accessToken,
+      user,
+    }
+    saveAuthSession(session)
+    return session
+  } catch (error) {
+    console.warn('Failed to restore auth session', error)
+    clearAuthSession()
+    httpClient.setAuthTokens(null)
+    return null
+  }
 }

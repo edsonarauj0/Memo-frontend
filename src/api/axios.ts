@@ -2,6 +2,7 @@ import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
   type AxiosResponse,
+  type InternalAxiosRequestConfig,
 } from 'axios'
 import {
   clearAuthSession,
@@ -20,7 +21,7 @@ type AxiosRequestConfigWithRetry = AxiosRequestConfig & { _retry?: boolean }
 
 interface RefreshResponse {
   accessToken: string
-  refreshToken?: string
+  refreshToken?: string | null
 }
 
 const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ??
@@ -34,13 +35,12 @@ class AxiosClient {
 
   private authToken: string | null = null
 
-  private refreshToken: string | null = null
-
   private refreshPromise: Promise<string | null> | null = null
 
   private constructor() {
     this.axiosInstance = axios.create({
       baseURL: BASE_URL,
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -50,7 +50,6 @@ class AxiosClient {
     const storedSession = loadAuthSession()
     if (storedSession) {
       this.authToken = storedSession.accessToken
-      this.refreshToken = storedSession.refreshToken
     }
 
     this.axiosInstance.interceptors.request.use(config => this.attachAuthorizationHeader(config))
@@ -67,14 +66,11 @@ class AxiosClient {
     return AxiosClient.instance
   }
 
-  public setAuthTokens(accessToken: string | null, refreshToken?: string | null): void {
+  public setAuthTokens(accessToken: string | null): void {
     this.authToken = accessToken
-    if (refreshToken !== undefined) {
-      this.refreshToken = refreshToken
-    }
   }
 
-  private attachAuthorizationHeader(config: AxiosRequestConfig) {
+  private attachAuthorizationHeader(config: InternalAxiosRequestConfig) {
     if (this.authToken) {
       config.headers = config.headers ?? {}
       ;(config.headers as Record<string, unknown>).Authorization = `Bearer ${this.authToken}`
@@ -93,8 +89,9 @@ class AxiosClient {
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      this.refreshToken &&
       originalRequest.url &&
+      !originalRequest.url.includes('/auth/login') &&
+      !originalRequest.url.includes('/auth/register') &&
       !originalRequest.url.includes('/auth/refresh')
     ) {
       originalRequest._retry = true
@@ -114,7 +111,7 @@ class AxiosClient {
     }
 
     if (originalRequest?.url?.includes('/auth/refresh')) {
-      this.setAuthTokens(null, null)
+      this.setAuthTokens(null)
       clearAuthSession()
     }
 
@@ -122,34 +119,27 @@ class AxiosClient {
   }
 
   private async refreshAccessToken(): Promise<string | null> {
-    if (!this.refreshToken) {
-      clearAuthSession()
-      return null
-    }
-
     if (!this.refreshPromise) {
       this.refreshPromise = this.axiosInstance
         .post<RefreshResponse>(
           REFRESH_ENDPOINT,
-          { refreshToken: this.refreshToken },
+          undefined,
           { _retry: true } as AxiosRequestConfigWithRetry,
         )
         .then(response => {
-          const { accessToken, refreshToken } = response.data
+          const { accessToken } = response.data
           if (!accessToken) {
             throw new Error('Access token not provided by refresh endpoint')
           }
 
-          const nextRefreshToken = refreshToken ?? this.refreshToken
-          this.setAuthTokens(accessToken, nextRefreshToken)
+          this.setAuthTokens(accessToken)
           updateAuthSession({
             accessToken,
-            refreshToken: nextRefreshToken,
           })
           return accessToken
         })
         .catch(refreshError => {
-          this.setAuthTokens(null, null)
+          this.setAuthTokens(null)
           clearAuthSession()
           throw this.normalizeError(refreshError)
         })

@@ -5,6 +5,7 @@ import {
   getStoredSession,
   login as authLogin,
   logout as authLogout,
+  restoreSession as restoreAuthSession,
   validateToken as validateAuthToken,
 } from '../services/auth'
 import type { AuthSession, User } from '../types/auth'
@@ -14,20 +15,27 @@ export interface AuthContextType {
   user: User | null
   login: (credentials: LoginPayload) => Promise<void>
   logout: () => Promise<void>
+  isLoading: boolean
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<AuthSession | null>(() => getStoredSession())
+  const [session, setSession] = useState<AuthSession | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const token = session?.accessToken ?? null
   const user = session?.user ?? null
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
     const handler = (event: Event) => {
       const detail = (event as CustomEvent<AuthSession | null>).detail ?? null
       setSession(detail)
+      setIsLoading(false)
     }
 
     window.addEventListener('auth:changed', handler as EventListener)
@@ -36,22 +44,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    let isMounted = true
+
+    const initializeSession = async () => {
+      const stored = getStoredSession()
+      if (stored) {
+        if (isMounted) {
+          setSession(stored)
+          setIsLoading(false)
+        }
+        return
+      }
+
+      try {
+        const restored = await restoreAuthSession()
+        if (isMounted && restored) {
+          setSession(restored)
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void initializeSession()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   const login = useCallback(async (credentials: LoginPayload) => {
     const data = await authLogin(credentials)
     setSession({
       accessToken: data.accessToken,
-      refreshToken: data.refreshToken,
       user: data.user,
     })
+    setIsLoading(false)
   }, [])
 
   const logout = useCallback(async () => {
     await authLogout()
     setSession(null)
+    setIsLoading(false)
   }, [])
 
   useEffect(() => {
-    if (!token) {
+    if (!token || isLoading) {
       return
     }
 
@@ -63,11 +104,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     void verifyToken()
-  }, [logout, token])
+  }, [isLoading, logout, token])
 
   const value = useMemo<AuthContextType>(
-    () => ({ token, user, login, logout }),
-    [login, logout, token, user],
+    () => ({ token, user, login, logout, isLoading }),
+    [isLoading, login, logout, token, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
