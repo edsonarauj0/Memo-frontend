@@ -31,16 +31,12 @@ import {
 } from "./ui/sidebar"
 import { useAuth } from "../hooks/useAuth"
 import { useNavigate } from "react-router-dom"
+import type { User } from "../types/auth"
 
 export function NavUser({
   user,
 }: {
-  user: {
-    nome: string
-    sobrenome: string
-    email: string
-    foto?: string | null
-  }
+  user: Pick<User, "nome" | "sobrenome" | "email" | "foto">
 }) {
   const { isMobile } = useSidebar()
   const { logout } = useAuth()
@@ -48,8 +44,8 @@ export function NavUser({
   const fullName = `${user.nome} ${user.sobrenome}`
   const initials = `${user.nome.charAt(0)}${user.sobrenome.charAt(0)}`
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     navigate("/login")
   }
 

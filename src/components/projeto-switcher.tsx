@@ -17,23 +17,48 @@ import {
   useSidebar,
 } from "./ui/sidebar"
 
-export function ProjetoSwitcher({
-  projetos,
-}: {
-  projetos: Array<{
-    id: number;
-    nome: string;
-    descricao: string;
-    cargo: string | null;
-    editais: string | null;
-    imagemUrl: string | null;
-  }>;
-}) {
+type ProjetoSwitcherItem = {
+  id: number
+  nome: string
+  descricao: string
+  cargo: string | null
+  editais: string | null
+  imagemUrl: string | null
+}
+
+export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] }) {
   const { isMobile } = useSidebar()
-  const [projetoAtivo, setProjetoAtivo] = React.useState(projetos[0])
-debugger
+  const [projetoAtivo, setProjetoAtivo] = React.useState<ProjetoSwitcherItem | null>(
+    () => projetos[0] ?? null,
+  )
+
+  React.useEffect(() => {
+    if (projetos.length === 0) {
+      setProjetoAtivo(null)
+      return
+    }
+
+    setProjetoAtivo(current => {
+      if (!current) {
+        return projetos[0]
+      }
+
+      const nextProjeto = projetos.find(projeto => projeto.id === current.id)
+      return nextProjeto ?? projetos[0]
+    })
+  }, [projetos])
+
   if (!projetoAtivo) {
-    return null
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton className="text-sidebar-foreground/70" disabled>
+            <Plus className="mr-2 size-4" />
+            <span>Nenhum projeto disponível</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
   }
 
   return (
@@ -66,7 +91,7 @@ debugger
                 <DropdownMenuLabel className="text-xs text-muted-foreground">
                   Teams
                 </DropdownMenuLabel>
-                {projetos.map((projeto, index) => (
+                {projetos.map(projeto => (
                   <DropdownMenuItem
                     key={projeto.nome}
                     onClick={() => setProjetoAtivo(projeto)}

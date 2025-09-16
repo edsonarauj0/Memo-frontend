@@ -1,32 +1,9 @@
 import httpClient from './axios'
+import type { User } from '../types/auth'
 
 export interface LoginPayload {
   email: string
   password: string
-}
-
-export interface User {
-  id: number
-  nome: string
-  sobrenome: string
-  email: string
-  foto?: string | null
-  projetos: Projeto[]
-}
-
-export interface Projeto {
-  nome: string
-  descricao: string
-  description: string | null
-  role: string | null
-  notices: string | null
-  imageUrl: string | null
-  name: string | null
-  id: number
-  cargo: string | null
-  observacoes: string | null
-  editais: string | null
-  imagemUrl: string | null
 }
 
 export interface LoginResponse {
@@ -35,8 +12,8 @@ export interface LoginResponse {
   user: User
 }
 
-export interface RefreshResponse {
-  accessToken: string
+interface RefreshPayload {
+  refreshToken: string
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
@@ -46,17 +23,23 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
   })
 }
 
-export async function refresh(
-  refreshToken: string,
-): Promise<RefreshResponse> {
-  return httpClient.post<RefreshResponse>({
-    url: '/auth/refresh',
+export async function refreshSession(refreshToken: string): Promise<LoginResponse> {
+  const payload: RefreshPayload = { refreshToken }
+  return httpClient.post<LoginResponse>({
+    url: '/auth/auth/refresh',
+    data: payload,
+  })
+}
+
+export async function logout(refreshToken: string): Promise<void> {
+  return httpClient.post<void>({
+    url: '/auth/logout',
     data: { refreshToken },
   })
 }
 
-export async function validateToken(): Promise<void> {
-  return httpClient.get<void>({
+export async function validateToken(): Promise<boolean> {
+  return httpClient.get<boolean>({
     url: '/auth/validate',
   })
 }
