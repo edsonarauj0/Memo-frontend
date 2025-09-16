@@ -1,12 +1,7 @@
 import * as React from "react";
 import { Button, type ButtonProps } from "../../../components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from "@/lib/utils";
 
 type GetStartedButtonProps = ButtonProps & {
   iconSize?: number;

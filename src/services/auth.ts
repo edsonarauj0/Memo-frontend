@@ -1,41 +1,56 @@
 import httpClient from '../api/axios'
 import {
   login as loginApi,
+  logout as logoutApi,
   validateToken as validateTokenApi,
   type LoginPayload,
   type LoginResponse,
 } from '../api/auth'
-import { clearToken, loadToken, saveToken } from '../lib/auth'
+import {
+  clearAuthSession,
+  loadAuthSession,
+  saveAuthSession,
+} from '../lib/auth'
+import type { AuthSession } from '../types/auth'
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const data = await loginApi(payload)
-  httpClient.setAuthTokens(data.accessToken, null)
-  saveToken(data.accessToken)
+  httpClient.setAuthTokens(data.accessToken, data.refreshToken)
+  saveAuthSession({
+    accessToken: data.accessToken,
+    refreshToken: data.refreshToken,
+    user: data.user,
+  })
   return data
 }
-export async function validateToken(): Promise<boolean> {
+
+export async function logout(): Promise<void> {
+  const session = loadAuthSession()
+
   try {
-    const response = await validateTokenApi()
-    if (response) {
-      return true
+    if (session?.refreshToken) {
+      await logoutApi(session.refreshToken)
     }
-    clearStoredToken()
-    return false
-  } catch {
-    // On any error (including invalid token), clear stored token
-    clearStoredToken()
-    return false
+  } catch (error) {
+    console.warn('Failed to invalidate refresh token during logout', error)
+  } finally {
+    clearAuthSession()
+    httpClient.setAuthTokens(null, null)
   }
-}
-export function getStoredToken(): string | null {
-  const token = loadToken()
-  if (token) {
-    httpClient.setAuthTokens(token, null)
-  }
-  return token
 }
 
-export function clearStoredToken() {
-  clearToken()
-  httpClient.setAuthTokens(null, null)
+export async function validateToken(): Promise<boolean> {
+  try {
+    return await validateTokenApi()
+  } catch {
+    return false
+  }
+}
+
+export function getStoredSession(): AuthSession | null {
+  const session = loadAuthSession()
+  if (session?.accessToken) {
+    httpClient.setAuthTokens(session.accessToken, session.refreshToken)
+  }
+  return session
 }
