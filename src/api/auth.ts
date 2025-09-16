@@ -8,12 +8,13 @@ export interface LoginPayload {
 
 export interface LoginResponse {
   accessToken: string
-  refreshToken: string
+  refreshToken?: string | null
   user: User
 }
 
-interface RefreshPayload {
-  refreshToken: string
+export interface RefreshResponse {
+  accessToken: string
+  refreshToken?: string | null
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
@@ -23,18 +24,15 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
   })
 }
 
-export async function refreshSession(refreshToken: string): Promise<LoginResponse> {
-  const payload: RefreshPayload = { refreshToken }
-  return httpClient.post<LoginResponse>({
+export async function refreshSession(): Promise<RefreshResponse> {
+  return httpClient.post<RefreshResponse>({
     url: '/auth/auth/refresh',
-    data: payload,
   })
 }
 
-export async function logout(refreshToken: string): Promise<void> {
+export async function logout(): Promise<void> {
   return httpClient.post<void>({
     url: '/auth/logout',
-    data: { refreshToken },
   })
 }
 

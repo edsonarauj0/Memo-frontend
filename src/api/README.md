@@ -12,14 +12,14 @@ export async function fetchUsers() {
 }
 ```
 
-## Definindo os tokens de autorização
+## Definindo o token de acesso
 
-Após autenticar o usuário, defina os tokens para que o token de acesso seja incluído nas próximas requisições e o token de atualização seja utilizado automaticamente:
+Após autenticar o usuário, defina o token de acesso para que ele seja incluído nas próximas requisições. A renovação do token é realizada automaticamente pelo cookie HttpOnly fornecido pelo backend:
 
 ```ts
 import httpClient from './axios'
 
-httpClient.setAuthTokens('meu-access-token', 'meu-refresh-token')
+httpClient.setAuthTokens('meu-access-token')
 ```
 
 ## Criando novas chamadas de API

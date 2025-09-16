@@ -29,11 +29,5 @@ export interface User {
 
 export interface AuthSession {
   accessToken: string
-  refreshToken: string
   user: User | null
-}
-
-export interface AuthTokens {
-  accessToken: string
-  refreshToken: string
 }
