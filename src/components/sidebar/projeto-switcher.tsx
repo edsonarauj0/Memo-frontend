@@ -9,13 +9,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+} from "../ui/dropdown-menu"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "./ui/sidebar"
+} from "../ui/sidebar"
+import { ModalAdicionarProjeto } from "./nav-modal-adicionar-projeto"  // Importe o modal aqui
 
 type ProjetoSwitcherItem = {
   id: number
@@ -27,7 +28,9 @@ type ProjetoSwitcherItem = {
 }
 
 export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
+  const [abrirModalAdicionarProjeto, setAbrirModalAdicionarProjeto] = React.useState<boolean>(false);
+
   const [projetoAtivo, setProjetoAtivo] = React.useState<ProjetoSwitcherItem | null>(
     () => projetos[0] ?? null,
   )
@@ -105,24 +108,34 @@ export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] 
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-2 p-2">
+                <DropdownMenuItem 
+                  className="gap-2 p-2" 
+                  onSelect={() => setAbrirModalAdicionarProjeto(true)}  // Adicione isso para abrir o modal
+                >
                   <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                     <Plus className="size-4" />
                   </div>
-                  <div className="font-medium text-muted-foreground">Add team</div>
+                  <div className="font-medium text-muted-foreground">Adicionar Projeto</div>
                 </DropdownMenuItem>
               </>
             ) : (
-              <DropdownMenuItem className="gap-2 p-2">
+              <DropdownMenuItem 
+                className="gap-2 p-2"
+                onSelect={() => setAbrirModalAdicionarProjeto(true)}  // Mova para onSelect aqui
+              >
                 <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                   <Plus className="size-4" />
                 </div>
-                <div className="font-medium text-muted-foreground">Add team</div>
+                <div className="font-medium text-muted-foreground">Adicionar</div>
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+      <ModalAdicionarProjeto
+        open={abrirModalAdicionarProjeto} 
+        onOpenChange={setAbrirModalAdicionarProjeto} 
+      />
     </SidebarMenu>
   )
 }

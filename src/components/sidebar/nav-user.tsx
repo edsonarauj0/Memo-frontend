@@ -13,7 +13,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "./ui/avatar"
+} from "../ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,16 +22,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+} from "../ui/dropdown-menu"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "./ui/sidebar"
-import { useAuth } from "../hooks/useAuth"
+} from "../ui/sidebar"
+import { useAuth } from "../../hooks/useAuth"
 import { useNavigate } from "react-router-dom"
-import type { User } from "../types/auth"
+import type { User } from "../../types/auth"
 
 export function NavUser({
   user,

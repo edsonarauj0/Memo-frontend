@@ -22,7 +22,12 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Adicione esta seção para resolver o alias '@' */
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "types": ["vitest/globals"],
   "include": ["src"]

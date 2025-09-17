@@ -1,7 +1,7 @@
 import * as React from "react"
 
-import { sidebarData } from "../config/navigation"
-import { useAuth } from "../hooks/useAuth"
+import { sidebarData } from "../../config/navigation"
+import { useAuth } from "../../hooks/useAuth"
 
 import { NavMain } from "./nav-main"
 import { NavProjects } from "./nav-projects"
@@ -14,7 +14,7 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarRail,
-} from "./ui/sidebar"
+} from "../ui/sidebar"
 import { ProjetoSwitcher } from "./projeto-switcher"
 
 export function Menu({ children, ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -27,7 +27,7 @@ export function Menu({ children, ...props }: React.ComponentProps<typeof Sidebar
             id: projeto.id,
             nome: projeto.nome ?? "",
             plan: projeto.cargo ?? "",
-            logo: projeto.imagemUrl, // Replace with your actual logo component or logic
+            logo: projeto.imagemUrl,
             descricao: projeto.descricao ?? "",
             editais: projeto.editais,
           })) || []} />
