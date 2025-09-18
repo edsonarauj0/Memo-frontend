@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input"
 
 const projetoFormSchema = z.object({
   name: z
-    .string({ required_error: "O nome do projeto é obrigatório." })
+    .string().min(1, "O nome do projeto é obrigatório." )
     .trim()
     .min(3, "Informe ao menos 3 caracteres.")
     .max(80, "Use no máximo 80 caracteres."),
@@ -28,6 +28,16 @@ const projetoFormSchema = z.object({
     .max(160, "Use no máximo 160 caracteres.")
     .optional()
     .or(z.literal("")),
+    instituicao: z
+    .string().min(1,"A instituição é obrigatória." )
+    .trim()
+    .min(3, "Informe ao menos 3 caracteres.")
+    .max(80, "Use no máximo 80 caracteres."),
+    cargo: z
+    .string().min(1, "O cargo é obrigatório.")
+    .trim()
+    .min(3, "Informe ao menos 3 caracteres.")
+    .max(80, "Use no máximo 80 caracteres."),
 })
 
 export type ProjetoFormValues = z.infer<typeof projetoFormSchema>
@@ -44,6 +54,8 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
     defaultValues: {
       name: "",
       description: "",
+      instituicao: "",
+      cargo: "",
     },
   })
 
@@ -99,6 +111,32 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
                     <FormLabel>Descrição</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Breve descrição" autoComplete="off" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="instituicao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Organizadora</FormLabel>
+                    <FormControl>
+                      <Input {...field} autoComplete="off" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="cargo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cargo</FormLabel>
+                    <FormControl>
+                      <Input {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
