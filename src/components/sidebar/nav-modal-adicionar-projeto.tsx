@@ -2,6 +2,7 @@ import { useCallback } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { createProjeto } from "@/api/projeto"
 
 const projetoFormSchema = z.object({
   name: z
@@ -72,10 +74,26 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
     [onOpenChange, reset],
   )
 
-  const handleSubmit = submit(async (values) => {
-    await onSubmit?.(values)
-    onOpenChange(false)
-    reset()
+  const handleSubmit = submit(async values => {
+    try {
+      const descricao = values.description?.length ? values.description : null
+
+      await createProjeto({
+        nome: values.name,
+        descricao,
+        instituicao: values.instituicao,
+        cargo: values.cargo,
+      })
+
+      toast.success("Projeto criado com sucesso!")
+
+      await onSubmit?.(values)
+      onOpenChange(false)
+      reset()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não foi possível criar o projeto."
+      toast.error(message)
+    }
   })
 
   return (
