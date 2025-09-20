@@ -15,6 +15,7 @@ export interface LoginResponse {
 export interface RefreshResponse {
   accessToken: string
   refreshToken?: string | null
+  user?: User | null
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
@@ -27,6 +28,12 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
 export async function refreshSession(): Promise<RefreshResponse> {
   return httpClient.post<RefreshResponse>({
     url: '/auth/auth/refresh',
+  })
+}
+
+export async function getCurrentUser(): Promise<User> {
+  return httpClient.get<User>({
+    url: '/auth/me',
   })
 }
 
