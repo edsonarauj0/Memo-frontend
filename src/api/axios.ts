@@ -9,6 +9,7 @@ import {
   loadAuthSession,
   updateAuthSession,
 } from '../lib/auth'
+import type { AuthSession, User } from '../types/auth'
 
 interface RequestOptions {
   url: string
@@ -22,6 +23,7 @@ type AxiosRequestConfigWithRetry = AxiosRequestConfig & { _retry?: boolean }
 interface RefreshResponse {
   accessToken: string
   refreshToken?: string | null
+  user?: User | null
 }
 
 const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ??
@@ -127,15 +129,17 @@ class AxiosClient {
           { _retry: true } as AxiosRequestConfigWithRetry,
         )
         .then(response => {
-          const { accessToken } = response.data
+          const { accessToken, user } = response.data
           if (!accessToken) {
             throw new Error('Access token not provided by refresh endpoint')
           }
 
           this.setAuthTokens(accessToken)
-          updateAuthSession({
-            accessToken,
-          })
+          const sessionUpdate: Partial<AuthSession> = { accessToken }
+          if (user !== undefined) {
+            sessionUpdate.user = user ?? null
+          }
+          updateAuthSession(sessionUpdate)
           return accessToken
         })
         .catch(refreshError => {

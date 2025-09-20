@@ -4,13 +4,13 @@ import {
   logout as logoutApi,
   refreshSession as refreshSessionApi,
   validateToken as validateTokenApi,
+  getCurrentUser,
   type LoginPayload,
   type LoginResponse,
 } from '../api/auth'
 import {
   clearAuthSession,
   loadAuthSession,
-  loadStoredUser,
   saveAuthSession,
 } from '../lib/auth'
 import type { AuthSession } from '../types/auth'
@@ -53,11 +53,6 @@ export function getStoredSession(): AuthSession | null {
 }
 
 export async function restoreSession(): Promise<AuthSession | null> {
-  const user = loadStoredUser()
-  if (!user) {
-    return null
-  }
-
   try {
     const data = await refreshSessionApi()
     if (!data.accessToken) {
@@ -65,6 +60,16 @@ export async function restoreSession(): Promise<AuthSession | null> {
     }
 
     httpClient.setAuthTokens(data.accessToken)
+    let user = data.user ?? null
+
+    if (!user) {
+      try {
+        user = await getCurrentUser()
+      } catch (error) {
+        console.warn('Failed to load current user during session restore', error)
+      }
+    }
+
     const session: AuthSession = {
       accessToken: data.accessToken,
       user,
