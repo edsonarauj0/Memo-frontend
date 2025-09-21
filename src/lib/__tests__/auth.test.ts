@@ -17,7 +17,9 @@ describe('auth session persistence', () => {
         periodoRevisao: null,
         classificacaoPerformance: null,
         foto: null,
+        disciplinas: [],
         projetos: null,
+        projetoSelecionadoId: null,
     })
 
     const createSession = (): AuthSession => ({

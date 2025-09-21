@@ -22,16 +22,19 @@ import {
 } from "../ui/sidebar"
 import { ProjetoSwitcher } from "./projeto-switcher"
 import { Separator } from "../ui/separator"
-import { Home, MoreHorizontal } from "lucide-react"
+import { Home } from "lucide-react"
 import { NavDisciplinas } from "./nav-disciplinas"
+import type { Disciplina } from "@/types/auth"
 
 type MenuProps = React.ComponentProps<typeof Sidebar> & {
   header?: React.ReactNode
   toolbar?: React.ReactNode
+  disciplinas?: Disciplina[] | null
 }
 
-export function Menu({ children, header, toolbar, ...props }: MenuProps) {
+export function Menu({ children, header, toolbar, disciplinas, ...props }: MenuProps) {
   const { user } = useAuth();
+  const sidebarDisciplinas = disciplinas ?? user?.disciplinas ?? null;
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" {...props}>
@@ -63,7 +66,7 @@ export function Menu({ children, header, toolbar, ...props }: MenuProps) {
           </SidebarGroup>
           <NavMain items={sidebarData.navMain} />
           <NavProjects projects={sidebarData.projects} />
-          <NavDisciplinas disciplinas={user.disciplinas} />
+          <NavDisciplinas disciplinas={sidebarDisciplinas} />
         </SidebarContent>
         <SidebarFooter>
           {user && <NavUser user={user} />}

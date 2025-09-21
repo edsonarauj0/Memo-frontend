@@ -3,6 +3,13 @@ export interface ClassificacaoPerformance {
   regularMax: number
 }
 
+export interface Disciplina {
+  id: number
+  nome: string
+  descricao: string | null
+  cor: string | null
+}
+
 export interface Projeto {
   id: number
   nome: string
@@ -10,6 +17,7 @@ export interface Projeto {
   cargo: string | null
   editais: string | null
   imagemUrl: string | null
+  disciplinas?: Disciplina[] | null
 }
 
 export interface User {
@@ -25,6 +33,7 @@ export interface User {
   classificacaoPerformance: ClassificacaoPerformance | null
   foto: string | null
   projetos: Projeto[] | null
+  disciplinas: Disciplina[] | null
   projetoSelecionadoId: number | null
 }
 
