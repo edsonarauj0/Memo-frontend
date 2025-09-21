@@ -20,6 +20,7 @@ import { ModalAdicionarProjeto } from "./nav-modal-adicionar-projeto"  // Import
 import { selecionarProjeto } from "@/api/projeto"
 import { useAuth } from "@/hooks/useAuth"
 import { updateAuthSession } from "@/lib/auth"
+import type { Projeto } from "@/types/auth"
 
 type ProjetoSwitcherItem = {
   id: number
@@ -81,6 +82,35 @@ export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: 
       setProjetoAtivo(nextProjetoAtivo)
     }
   }
+
+  const handleProjetoCriado = React.useCallback(
+    (novoProjeto: Projeto) => {
+      if (!user) {
+        return
+      }
+
+      const projetosAtuais = user.projetos ?? []
+      const projetosAtualizados = [...projetosAtuais, novoProjeto]
+
+      updateAuthSession({
+        user: {
+          ...user,
+          projetos: projetosAtualizados,
+          projetoSelecionadoId: novoProjeto.id,
+        },
+      })
+
+      setProjetoAtivo({
+        id: novoProjeto.id,
+        nome: novoProjeto.nome,
+        plan: novoProjeto.cargo,
+        logo: novoProjeto.imagemUrl,
+        descricao: novoProjeto.descricao ?? "",
+        editais: novoProjeto.editais,
+      })
+    },
+    [user],
+  )
 
   if (!projetoAtivo) {
     return (
@@ -167,8 +197,9 @@ export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: 
         </DropdownMenu>
       </SidebarMenuItem>
       <ModalAdicionarProjeto
-        open={abrirModalAdicionarProjeto} 
-        onOpenChange={setAbrirModalAdicionarProjeto} 
+        open={abrirModalAdicionarProjeto}
+        onOpenChange={setAbrirModalAdicionarProjeto}
+        onSubmit={handleProjetoCriado}
       />
     </SidebarMenu>
   )

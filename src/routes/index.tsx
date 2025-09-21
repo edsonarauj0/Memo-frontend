@@ -3,7 +3,6 @@ import Login from '../pages/Login'
 import Dashboard from '../pages/Dashboard'
 import ProtectedRoute from './ProtectedRoute'
 import { Menu } from '../components/sidebar/app-sidebar'
-import { SidebarTrigger } from '@/components/ui/sidebar'
 
 export function AppRoutes() {
   return (

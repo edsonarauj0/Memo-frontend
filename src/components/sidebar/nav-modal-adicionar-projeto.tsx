@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { createProjeto } from "@/api/projeto"
+import { createProjeto, type CreateProjetoResponse } from "@/api/projeto"
 
 const projetoFormSchema = z.object({
   nome: z
@@ -51,7 +51,7 @@ export type ProjetoFormValues = z.infer<typeof projetoFormSchema>
 interface ModalAdicionarProjetoProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit?: (values: ProjetoFormValues) => Promise<void> | void
+  onSubmit?: (projeto: CreateProjetoResponse) => Promise<void> | void
 }
 
 export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdicionarProjetoProps) {
@@ -82,7 +82,7 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
     try {
       const descricao = values.descricao?.length ? values.descricao : null
 
-      await createProjeto({
+      const projetoCriado = await createProjeto({
         nome: values.nome,
         descricao,
         organizacao: values.organizacao ?? "",
@@ -91,7 +91,7 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
 
       toast.success("Projeto criado com sucesso!")
 
-      await onSubmit?.(values)
+      await onSubmit?.(projetoCriado)
       onOpenChange(false)
       reset()
     } catch (error) {
