@@ -32,6 +32,7 @@ export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] 
   const [abrirModalAdicionarProjeto, setAbrirModalAdicionarProjeto] = React.useState<boolean>(false);
 
   const [projetoAtivo, setProjetoAtivo] = React.useState<ProjetoSwitcherItem | null>(
+
     () => projetos[0] ?? null,
   )
 
@@ -51,6 +52,14 @@ export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] 
     })
   }, [projetos])
 
+  const selecionarProjeto = async (values: { projetoId: number }) => {
+    debugger
+    if (values.projetoId) {
+      await selecionarProjeto({ projetoId: values.projetoId })
+      setProjetoAtivo(projetos.find(projeto => projeto.id === values.projetoId) ?? null)
+    }
+  }
+
   if (!projetoAtivo) {
     return (
       <SidebarMenu>
@@ -64,6 +73,7 @@ export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] 
     )
   }
 
+debugger
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -89,6 +99,7 @@ export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] 
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
+            
             {projetos.length > 1 ? (
               <>
                 <DropdownMenuLabel className="text-xs text-muted-foreground">
@@ -97,7 +108,10 @@ export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] 
                 {projetos.map(projeto => (
                   <DropdownMenuItem
                     key={projeto.nome}
-                    onClick={() => setProjetoAtivo(projeto)}
+                    onClick={() => {
+                      setProjetoAtivo(projeto)
+                      selecionarProjeto({ projetoId: projeto.id })
+                    }}
                     className="gap-2 p-2"
                   >
                     <div className="flex size-6 items-center justify-center rounded-sm border">
