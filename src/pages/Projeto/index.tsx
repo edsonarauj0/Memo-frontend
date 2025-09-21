@@ -22,7 +22,6 @@ export default function ProjetoPage() {
   const [erro, setErro] = useState<string | null>(null)
 
   useEffect(() => {
-    debugger
     if (!isValidProjetoId(id)) {
       navigate(`/projeto/${DEFAULT_PROJETO_ID}`, { replace: true })
       return
@@ -75,7 +74,6 @@ export default function ProjetoPage() {
   const disciplinas = projeto?.materias ?? []
   const titulo = projeto?.nome ?? "Projeto"
   const descricao = projeto?.descricao
-debugger
   return (
     <Menu
       header={<h1 className="text-xl font-semibold">{titulo}</h1>}

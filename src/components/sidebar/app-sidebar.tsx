@@ -36,8 +36,8 @@ type MenuProps = React.ComponentProps<typeof Sidebar> & {
 
 export function Menu({ children, header, toolbar, materias, projetoSelecionado, ...props }: MenuProps) {
   const { user } = useAuth();
-  debugger
   const sidebarMaterias = projetoSelecionado?.materias ?? materias ?? user?.materias ?? null;
+  const projetoId = projetoSelecionado?.id ?? user?.projetoSelecionadoId ?? null;
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" {...props}>
@@ -67,7 +67,7 @@ export function Menu({ children, header, toolbar, materias, projetoSelecionado, 
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
-              <NavMaterias materias={sidebarMaterias} />
+              <NavMaterias materias={sidebarMaterias} projetoId={projetoId} />
           <NavMain items={sidebarData.navMain} />
           <NavProjects projects={sidebarData.projects} />
         </SidebarContent>
