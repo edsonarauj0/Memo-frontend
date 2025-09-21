@@ -14,7 +14,6 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <Menu>
-              <SidebarTrigger />
               <Dashboard />
             </Menu>
           </ProtectedRoute>

@@ -4,7 +4,7 @@ import { sidebarData } from "../../config/navigation"
 import { useAuth } from "../../hooks/useAuth"
 
 import { NavMain } from "./nav-main"
-import { NavProjects } from "./nav-projects"
+import { NavProjects } from "./nav-projetos"
 import { NavUser } from "./nav-user"
 import {
   Sidebar,
@@ -14,6 +14,7 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarRail,
+  SidebarTrigger,
 } from "../ui/sidebar"
 import { ProjetoSwitcher } from "./projeto-switcher"
 
@@ -42,7 +43,8 @@ export function Menu({ children, ...props }: React.ComponentProps<typeof Sidebar
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        <SidebarTrigger />{children}</SidebarInset>
     </SidebarProvider>
   )
 }
