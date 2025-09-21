@@ -1,5 +1,6 @@
 import * as React from "react"
 import { ChevronsUpDown, Command, Plus } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 import {
   DropdownMenu,
@@ -35,6 +36,7 @@ export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: 
   const { isMobile } = useSidebar();
   const [abrirModalAdicionarProjeto, setAbrirModalAdicionarProjeto] = React.useState<boolean>(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [projetoAtivo, setProjetoAtivo] = React.useState<ProjetoSwitcherItem | null>(
 
@@ -80,6 +82,7 @@ export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: 
       }
 
       setProjetoAtivo(nextProjetoAtivo)
+      navigate(`/projeto/${selectedProjetoId}`)
     }
   }
 
@@ -108,8 +111,10 @@ export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: 
         descricao: novoProjeto.descricao ?? "",
         editais: novoProjeto.editais,
       })
+
+      navigate(`/projeto/${novoProjeto.id}`)
     },
-    [user],
+    [navigate, user],
   )
 
   if (!projetoAtivo) {
