@@ -3,11 +3,25 @@ export interface ClassificacaoPerformance {
   regularMax: number
 }
 
-export interface Disciplina {
+export interface Materia {
   id: number
   nome: string
   descricao: string | null
   cor: string | null
+  isActive: boolean
+  icon: React.ReactNode
+  url?: string | null
+  topicos?: Topico[] | null
+}
+
+export interface Topico {
+  id: number
+  nome: string
+  descricao: string | null
+  cor: string | null
+  isActive: boolean
+  url?: string | null
+  icon: React.ReactNode
 }
 
 export interface Projeto {
@@ -17,7 +31,7 @@ export interface Projeto {
   cargo: string | null
   editais: string | null
   imagemUrl: string | null
-  disciplinas?: Disciplina[] | null
+  materias?: Materia[] | null
 }
 
 export interface User {
@@ -33,7 +47,7 @@ export interface User {
   classificacaoPerformance: ClassificacaoPerformance | null
   foto: string | null
   projetos: Projeto[] | null
-  disciplinas: Disciplina[] | null
+  materias: Materia[] | null
   projetoSelecionadoId: number | null
 }
 

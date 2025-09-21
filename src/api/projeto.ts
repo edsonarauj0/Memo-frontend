@@ -1,5 +1,5 @@
 import httpClient from "./axios"
-import type { Disciplina, Projeto } from "@/types/auth"
+import type { Materia, Projeto } from "@/types/auth"
 
 export interface CreateProjetoPayload {
   nome: string
@@ -19,7 +19,7 @@ export interface SelectProjetoResponse {
 export type CreateProjetoResponse = Projeto
 
 export type ProjetoDetalhado = Projeto & {
-  disciplinas: Disciplina[] | null
+  materias: Materia[] | null
 }
 
 export async function createProjeto(payload: CreateProjetoPayload): Promise<CreateProjetoResponse> {
