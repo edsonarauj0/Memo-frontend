@@ -19,6 +19,7 @@ import { ProjetoSwitcher } from "./projeto-switcher"
 
 export function Menu({ children, ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
+  debugger
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" {...props}>
@@ -30,7 +31,8 @@ export function Menu({ children, ...props }: React.ComponentProps<typeof Sidebar
             logo: projeto.imagemUrl,
             descricao: projeto.descricao ?? "",
             editais: projeto.editais,
-          })) || []} />
+          })) || []}
+          projetoSelecionadoId={user?.projetoSelecionadoId ?? undefined} />
         </SidebarHeader>
         <SidebarContent>
           <NavMain items={sidebarData.navMain} />

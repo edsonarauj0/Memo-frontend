@@ -25,6 +25,7 @@ export interface User {
   classificacaoPerformance: ClassificacaoPerformance | null
   foto: string | null
   projetos: Projeto[] | null
+  projetoSelecionadoId: number | null
 }
 
 export interface AuthSession {

@@ -17,23 +17,24 @@ import {
   useSidebar,
 } from "../ui/sidebar"
 import { ModalAdicionarProjeto } from "./nav-modal-adicionar-projeto"  // Importe o modal aqui
+import { selecionarProjeto } from "@/api/projeto"
 
 type ProjetoSwitcherItem = {
   id: number
   nome: string
+  plan: string | null
+  logo: string | null
   descricao: string
-  cargo: string | null
   editais: string | null
-  imagemUrl: string | null
 }
 
-export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] }) {
+export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: ProjetoSwitcherItem[], projetoSelecionadoId?: number }) {
   const { isMobile } = useSidebar();
   const [abrirModalAdicionarProjeto, setAbrirModalAdicionarProjeto] = React.useState<boolean>(false);
 
   const [projetoAtivo, setProjetoAtivo] = React.useState<ProjetoSwitcherItem | null>(
 
-    () => projetos[0] ?? null,
+    () => projetos.find(projeto => projeto.id === projetoSelecionadoId) ?? projetos[0] ?? null,
   )
 
   React.useEffect(() => {
@@ -52,7 +53,7 @@ export function ProjetoSwitcher({ projetos }: { projetos: ProjetoSwitcherItem[] 
     })
   }, [projetos])
 
-  const selecionarProjeto = async (values: { projetoId: number }) => {
+  const alterarProjeto = async (values: { projetoId: number }) => {
     debugger
     if (values.projetoId) {
       await selecionarProjeto({ projetoId: values.projetoId })
@@ -109,22 +110,21 @@ debugger
                   <DropdownMenuItem
                     key={projeto.nome}
                     onClick={() => {
-                      setProjetoAtivo(projeto)
-                      selecionarProjeto({ projetoId: projeto.id })
+                      alterarProjeto({ projetoId: projeto.id })
                     }}
                     className="gap-2 p-2"
                   >
                     <div className="flex size-6 items-center justify-center rounded-sm border">
                       <Command className="size-4 shrink-0" />
                     </div>
-                    {projeto.descricao}
+                    {projeto.nome}
                     <DropdownMenuShortcut>⌘{projeto.id}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="gap-2 p-2" 
-                  onSelect={() => setAbrirModalAdicionarProjeto(true)}  // Adicione isso para abrir o modal
+                  onSelect={() => setAbrirModalAdicionarProjeto(true)}
                 >
                   <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                     <Plus className="size-4" />
@@ -135,7 +135,7 @@ debugger
             ) : (
               <DropdownMenuItem 
                 className="gap-2 p-2"
-                onSelect={() => setAbrirModalAdicionarProjeto(true)}  // Mova para onSelect aqui
+                onSelect={() => setAbrirModalAdicionarProjeto(true)}
               >
                 <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                   <Plus className="size-4" />
