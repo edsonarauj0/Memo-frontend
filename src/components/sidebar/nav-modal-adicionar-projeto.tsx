@@ -19,27 +19,31 @@ import { Input } from "@/components/ui/input"
 import { createProjeto } from "@/api/projeto"
 
 const projetoFormSchema = z.object({
-  name: z
+  nome: z
     .string().min(1, "O nome do projeto é obrigatório." )
     .trim()
     .min(3, "Informe ao menos 3 caracteres.")
     .max(80, "Use no máximo 80 caracteres."),
-  description: z
+  descricao: z
     .string()
     .trim()
     .max(160, "Use no máximo 160 caracteres.")
     .optional()
     .or(z.literal("")),
-    instituicao: z
-    .string().min(1,"A instituição é obrigatória." )
+  organizacao: z
+    .string()
     .trim()
     .min(3, "Informe ao menos 3 caracteres.")
-    .max(80, "Use no máximo 80 caracteres."),
-    cargo: z
-    .string().min(1, "O cargo é obrigatório.")
+    .max(80, "Use no máximo 80 caracteres.")
+    .optional()
+    .or(z.literal("")),
+  cargo: z
+    .string()
     .trim()
     .min(3, "Informe ao menos 3 caracteres.")
-    .max(80, "Use no máximo 80 caracteres."),
+    .max(80, "Use no máximo 80 caracteres.")
+    .optional()
+    .or(z.literal("")),
 })
 
 export type ProjetoFormValues = z.infer<typeof projetoFormSchema>
@@ -54,9 +58,9 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
   const form = useForm<ProjetoFormValues>({
     resolver: zodResolver(projetoFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      instituicao: "",
+      nome: "",
+      descricao: "",
+      organizacao: "",
       cargo: "",
     },
   })
@@ -76,13 +80,13 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
 
   const handleSubmit = submit(async values => {
     try {
-      const descricao = values.description?.length ? values.description : null
+      const descricao = values.descricao?.length ? values.descricao : null
 
       await createProjeto({
-        nome: values.name,
+        nome: values.nome,
         descricao,
-        instituicao: values.instituicao,
-        cargo: values.cargo,
+        organizacao: values.organizacao ?? "",
+        cargo: values?.cargo?.length ? values.cargo : "",
       })
 
       toast.success("Projeto criado com sucesso!")
@@ -110,7 +114,7 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
             <div className="grid gap-4">
               <FormField
                 control={control}
-                name="name"
+                name="nome"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nome do Projeto</FormLabel>
@@ -123,7 +127,7 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
               />
               <FormField
                 control={control}
-                name="description"
+                name="descricao"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Descrição</FormLabel>
@@ -136,7 +140,7 @@ export function ModalAdicionarProjeto({ open, onOpenChange, onSubmit }: ModalAdi
               />
               <FormField
                 control={control}
-                name="instituicao"
+                name="organizacao"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Organizadora</FormLabel>

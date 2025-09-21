@@ -4,7 +4,7 @@ import type { Projeto } from "@/types/auth"
 export interface CreateProjetoPayload {
   nome: string
   descricao?: string | null
-  instituicao: string
+  organizacao: string
   cargo: string
 }
 
