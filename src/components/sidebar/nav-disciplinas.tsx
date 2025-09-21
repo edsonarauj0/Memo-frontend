@@ -1,18 +1,27 @@
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
-import { Home } from "lucide-react"
+import type { Disciplina } from "@/types/auth"
+import { BookOpen } from "lucide-react"
 
 type NavDisciplinasProps = {
-  disciplinas: Disciplina[]
+  disciplinas?: Disciplina[] | null
 }
 
 export function NavDisciplinas({ disciplinas }: NavDisciplinasProps) {
+  const lista = (disciplinas ?? []).filter(
+    (disciplina): disciplina is Disciplina => disciplina !== null && disciplina !== undefined,
+  )
+
+  if (lista.length === 0) {
+    return null
+  }
+
   return (
     <SidebarMenu>
-      {disciplinas.map((disciplina) => (
+      {lista.map(disciplina => (
         <SidebarMenuItem key={disciplina.id}>
           <SidebarMenuButton>
-            <Home />
+            <BookOpen />
             <span>{disciplina.nome}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>

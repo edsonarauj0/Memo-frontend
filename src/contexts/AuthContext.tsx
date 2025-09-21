@@ -13,7 +13,7 @@ import type { AuthSession, User } from '../types/auth'
 export interface AuthContextType {
   token: string | null
   user: User | null
-  login: (credentials: LoginPayload) => Promise<void>
+  login: (credentials: LoginPayload) => Promise<User>
   logout: () => Promise<void>
   isLoading: boolean
 }
@@ -83,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: data.user,
     })
     setIsLoading(false)
+    return data.user
   }, [])
 
   const logout = useCallback(async () => {

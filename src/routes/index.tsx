@@ -1,23 +1,23 @@
-import { Routes, Route } from 'react-router-dom'
-import Login from '../pages/Login'
-import Dashboard from '../pages/Dashboard'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { DEFAULT_PROJETO_ID } from '@/config/constants'
 import ProtectedRoute from './ProtectedRoute'
-import { Menu } from '../components/sidebar/app-sidebar'
+import Login from '@/pages/Login'
+import ProjetoPage from '@/pages/Projeto'
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route
-        path="/"
+        path="/projeto/:id"
         element={
           <ProtectedRoute>
-            <Menu>
-              <Dashboard />
-            </Menu>
+            <ProjetoPage />
           </ProtectedRoute>
         }
       />
+      <Route path="/" element={<Navigate to={`/projeto/${DEFAULT_PROJETO_ID}`} replace />} />
+      <Route path="*" element={<Navigate to={`/projeto/${DEFAULT_PROJETO_ID}`} replace />} />
     </Routes>
   )
 }
