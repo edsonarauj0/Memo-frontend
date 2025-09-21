@@ -18,6 +18,8 @@ import {
 } from "../ui/sidebar"
 import { ModalAdicionarProjeto } from "./nav-modal-adicionar-projeto"  // Importe o modal aqui
 import { selecionarProjeto } from "@/api/projeto"
+import { useAuth } from "@/hooks/useAuth"
+import { updateAuthSession } from "@/lib/auth"
 
 type ProjetoSwitcherItem = {
   id: number
@@ -31,6 +33,7 @@ type ProjetoSwitcherItem = {
 export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: ProjetoSwitcherItem[], projetoSelecionadoId?: number }) {
   const { isMobile } = useSidebar();
   const [abrirModalAdicionarProjeto, setAbrirModalAdicionarProjeto] = React.useState<boolean>(false);
+  const { user } = useAuth();
 
   const [projetoAtivo, setProjetoAtivo] = React.useState<ProjetoSwitcherItem | null>(
 
@@ -44,6 +47,13 @@ export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: 
     }
 
     setProjetoAtivo(current => {
+      if (projetoSelecionadoId !== undefined) {
+        const explicitProjeto = projetos.find(projeto => projeto.id === projetoSelecionadoId)
+        if (explicitProjeto) {
+          return explicitProjeto
+        }
+      }
+
       if (!current) {
         return projetos[0]
       }
@@ -51,13 +61,24 @@ export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: 
       const nextProjeto = projetos.find(projeto => projeto.id === current.id)
       return nextProjeto ?? projetos[0]
     })
-  }, [projetos])
+  }, [projetoSelecionadoId, projetos])
 
   const alterarProjeto = async (values: { projetoId: number }) => {
-    debugger
     if (values.projetoId) {
-      await selecionarProjeto({ projetoId: values.projetoId })
-      setProjetoAtivo(projetos.find(projeto => projeto.id === values.projetoId) ?? null)
+      const response = await selecionarProjeto({ projetoId: values.projetoId })
+      const selectedProjetoId = response.projetoSelecionadoId ?? values.projetoId
+      const nextProjetoAtivo = projetos.find(projeto => projeto.id === selectedProjetoId) ?? null
+
+      if (user) {
+        updateAuthSession({
+          user: {
+            ...user,
+            projetoSelecionadoId: selectedProjetoId,
+          },
+        })
+      }
+
+      setProjetoAtivo(nextProjetoAtivo)
     }
   }
 
@@ -74,7 +95,6 @@ export function ProjetoSwitcher({ projetos, projetoSelecionadoId }: { projetos: 
     )
   }
 
-debugger
   return (
     <SidebarMenu>
       <SidebarMenuItem>

@@ -19,7 +19,6 @@ import { ProjetoSwitcher } from "./projeto-switcher"
 
 export function Menu({ children, ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
-  debugger
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" {...props}>
