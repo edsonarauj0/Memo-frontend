@@ -15,7 +15,9 @@ export function AppRoutes() {
             <ProjetoPage />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path="materias" element={<Navigate to={`/materias`} replace />} />
+      </Route>
       <Route path="/" element={<Navigate to={`/projeto/${DEFAULT_PROJETO_ID}`} replace />} />
       <Route path="*" element={<Navigate to={`/projeto/${DEFAULT_PROJETO_ID}`} replace />} />
     </Routes>
