@@ -65,9 +65,9 @@ export function Menu({ children, header, toolbar, materias, projetoSelecionado, 
                   <span>Home</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <NavMaterias materias={sidebarMaterias} />
             </SidebarMenu>
           </SidebarGroup>
-              <NavMaterias materias={sidebarMaterias} />
           <NavMain items={sidebarData.navMain} />
           <NavProjects projects={sidebarData.projects} />
         </SidebarContent>

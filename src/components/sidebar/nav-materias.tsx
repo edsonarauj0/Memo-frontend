@@ -1,7 +1,7 @@
 
-import { SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubButton, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuAction, useSidebar } from "@/components/ui/sidebar"
+import { SidebarMenuItem, SidebarMenuButton, SidebarMenuAction, useSidebar, SidebarGroup, SidebarMenu } from "@/components/ui/sidebar"
 import type { Materia } from "@/types/auth"
-import { Book, Folder, Forward, MoreHorizontal, Trash2 } from "lucide-react"
+import { BookAlert, Folder, Forward, MoreHorizontal, Trash2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 
 type NavDisciplinasProps = {
@@ -9,19 +9,13 @@ type NavDisciplinasProps = {
 }
 
 export function NavMaterias({ materias }: NavDisciplinasProps) {
-  debugger
-  const lista = (materias ?? []).filter(
-    (materia): materia is Materia => materia !== null && materia !== undefined,
-  )
+
   const { isMobile } = useSidebar()
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Materias</SidebarGroupLabel>
-      <SidebarMenu>
-          <SidebarMenuItem >
+          <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a href={"#"}>
-                <Book />
+              <a href={`/materia/1`}>
+                <BookAlert />
                 <span>Materia</span>
               </a>
             </SidebarMenuButton>
@@ -39,21 +33,19 @@ export function NavMaterias({ materias }: NavDisciplinasProps) {
               >
                 <DropdownMenuItem>
                   <Folder className="text-muted-foreground" />
-                  <span>Ver materias</span>
+                  <span>Ver Materias</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Forward className="text-muted-foreground" />
-                  <span>Pesquisar materia</span>
+                  <span>Share Project</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Trash2 className="text-muted-foreground" />
-                  <span>Deletar</span>
+                  <span>Deletar Materia</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
-      </SidebarMenu>
-    </SidebarGroup>
   )
 }

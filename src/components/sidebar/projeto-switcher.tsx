@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "../ui/sidebar"
-import { ModalAdicionarProjeto } from "./nav-modal-adicionar-projeto"  // Importe o modal aqui
+import { ModalAdicionarProjeto } from "./nav-modal-adicionar-projeto"
 import { selecionarProjeto } from "@/api/projeto"
 import { useAuth } from "@/hooks/useAuth"
 import { updateAuthSession } from "@/lib/auth"
