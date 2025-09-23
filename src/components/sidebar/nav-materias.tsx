@@ -33,7 +33,7 @@ export function NavMaterias({ materias }: NavDisciplinasProps) {
           side={isMobile ? "bottom" : "right"}
           align={isMobile ? "end" : "start"}
         >
-          <DropdownMenuItem onClick={() => navigate(`/materias`)}>
+          <DropdownMenuItem onClick={() => navigate(`materias`)}>
             <Folder className="text-muted-foreground" />
             <span>Ver Materias</span>
           </DropdownMenuItem>

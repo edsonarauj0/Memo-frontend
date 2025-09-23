@@ -3,6 +3,7 @@ import { DEFAULT_PROJETO_ID } from '@/config/constants'
 import ProtectedRoute from './ProtectedRoute'
 import Login from '@/pages/Login'
 import ProjetoPage from '@/pages/Projeto'
+import Materia from '@/pages/Materia' // Importando o componente Materia
 
 export function AppRoutes() {
   return (
@@ -15,9 +16,8 @@ export function AppRoutes() {
             <ProjetoPage />
           </ProtectedRoute>
         }
-      >
-        <Route path="materias" element={<Navigate to={`/materias`} replace />} />
-      </Route>
+      />
+      <Route path="/materias" element={<Materia />} /> {/* Rota independente para Materia */}
       <Route path="/" element={<Navigate to={`/projeto/${DEFAULT_PROJETO_ID}`} replace />} />
       <Route path="*" element={<Navigate to={`/projeto/${DEFAULT_PROJETO_ID}`} replace />} />
     </Routes>
