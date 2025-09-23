@@ -1,18 +1,19 @@
-
-import { SidebarMenuItem, SidebarMenuButton, SidebarMenuAction, useSidebar, SidebarGroup, SidebarMenu } from "@/components/ui/sidebar"
-import type { Materia } from "@/types/auth"
+import { SidebarMenuItem, SidebarMenuButton, SidebarMenuAction, useSidebar } from "@/components/ui/sidebar"
+import { DEFAULT_PROJETO_ID } from "@/config/constants"
 import { BookAlert, Folder, Forward, MoreHorizontal, Trash2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
-type NavDisciplinasProps = {
-  materias?: Materia[] | null
-}
-
-export function NavMaterias({ materias }: NavDisciplinasProps) {
-
-  const navigate = useNavigate();
+export function NavMaterias() {
+  const navigate = useNavigate()
+  const { id } = useParams<{ id?: string }>()
   const { isMobile } = useSidebar()
+
+  const handleVerMaterias = () => {
+    const projetoId = id ?? String(DEFAULT_PROJETO_ID)
+    navigate(`/projeto/${projetoId}/materias`)
+  }
+
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild>
@@ -33,7 +34,7 @@ export function NavMaterias({ materias }: NavDisciplinasProps) {
           side={isMobile ? "bottom" : "right"}
           align={isMobile ? "end" : "start"}
         >
-          <DropdownMenuItem onClick={() => navigate(`materias`)}>
+          <DropdownMenuItem onClick={handleVerMaterias}>
             <Folder className="text-muted-foreground" />
             <span>Ver Materias</span>
           </DropdownMenuItem>

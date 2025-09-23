@@ -24,20 +24,15 @@ import { ProjetoSwitcher } from "./projeto-switcher"
 import { Separator } from "../ui/separator"
 import { Home } from "lucide-react"
 import { NavMaterias } from "./nav-materias"
-import type { Materia } from "@/types/auth"
-import type { ProjetoDetalhado } from "@/api/projeto"
 
 type MenuProps = React.ComponentProps<typeof Sidebar> & {
   header?: React.ReactNode
   toolbar?: React.ReactNode
-  materias?: Materia[] | null
-  projetoSelecionado?: ProjetoDetalhado | null
 }
 
-export function Menu({ children, header, toolbar, materias, projetoSelecionado, ...props }: MenuProps) {
-  const { user } = useAuth();
-  debugger
-  const sidebarMaterias = projetoSelecionado?.materias ?? materias ?? user?.materias ?? null;
+export function Menu({ children, header, toolbar, ...props }: MenuProps) {
+  const { user } = useAuth()
+
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon" {...props}>
@@ -65,7 +60,7 @@ export function Menu({ children, header, toolbar, materias, projetoSelecionado, 
                   <span>Home</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <NavMaterias materias={sidebarMaterias} />
+              <NavMaterias />
             </SidebarMenu>
           </SidebarGroup>
           <NavMain items={sidebarData.navMain} />
