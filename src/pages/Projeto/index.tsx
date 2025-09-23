@@ -1,87 +1,15 @@
-import { useEffect, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
 import { Menu } from "@/components/sidebar/app-sidebar"
-import { DEFAULT_PROJETO_ID } from "@/config/constants"
-import { buscarProjetoPorId, type ProjetoDetalhado } from "@/api/projeto"
-import { useAuth } from "@/hooks/useAuth"
-
-function isValidProjetoId(id?: string): id is string {
-  if (!id) {
-    return false
-  }
-  const parsed = Number(id)
-  return Number.isInteger(parsed) && parsed > 0
-}
+import { useProjetoDetalhado } from "@/hooks/useProjetoDetalhado"
 
 export default function ProjetoPage() {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const { user } = useAuth()
-  const [projeto, setProjeto] = useState<ProjetoDetalhado | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
-
-  useEffect(() => {
-    debugger
-    if (!isValidProjetoId(id)) {
-      navigate(`/projeto/${DEFAULT_PROJETO_ID}`, { replace: true })
-      return
-    }
-
-    const numericId = Number(id)
-
-    if (user?.projetos && user.projetos.length > 0) {
-      const projetoExiste = user.projetos.some(projetoAtual => projetoAtual.id === numericId)
-      if (!projetoExiste) {
-        navigate(`/projeto/${DEFAULT_PROJETO_ID}`, { replace: true })
-        return
-      }
-    }
-
-    let ativo = true
-    setIsLoading(true)
-    setErro(null)
-
-    buscarProjetoPorId(numericId)
-      .then(dadosProjeto => {
-        if (!ativo) {
-          return
-        }
-        setProjeto(dadosProjeto)
-      })
-      .catch(error => {
-        if (!ativo) {
-          return
-        }
-        const mensagem = error instanceof Error ? error.message : "Não foi possível carregar o projeto"
-        if (numericId !== DEFAULT_PROJETO_ID) {
-          navigate(`/projeto/${DEFAULT_PROJETO_ID}`, { replace: true })
-          return
-        }
-        setErro(mensagem)
-        setProjeto(null)
-      })
-      .finally(() => {
-        if (ativo) {
-          setIsLoading(false)
-        }
-      })
-
-    return () => {
-      ativo = false
-    }
-  }, [id, navigate, user?.projetos])
+  const { projeto, isLoading, erro } = useProjetoDetalhado()
 
   const disciplinas = projeto?.materias ?? []
   const titulo = projeto?.nome ?? "Projeto"
   const descricao = projeto?.descricao
-debugger
+
   return (
-    <Menu
-      header={<h1 className="text-xl font-semibold">{titulo}</h1>}
-      materias={projeto?.materias ?? null}
-      projetoSelecionado={projeto}
-    >
+    <Menu header={<h1 className="text-xl font-semibold">{titulo}</h1>}>
       {isLoading ? (
         <div className="flex flex-1 items-center justify-center">
           <span className="text-muted-foreground">Carregando projeto...</span>
