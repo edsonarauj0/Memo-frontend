@@ -165,6 +165,7 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
                                         </FormItem>
                                     );
                                 }}
+
                             />
                         </div>
                         <DialogFooter>
