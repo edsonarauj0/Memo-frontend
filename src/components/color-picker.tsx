@@ -99,6 +99,10 @@ export const ColorPicker = ({
     return 'css';
   });
 
+  const suppressChangeRef = useRef(false);
+  const lastEmittedValueRef = useRef<string | null>(null);
+
+
   // Update color when controlled value changes
   useEffect(() => {
     if (!value) {
@@ -115,6 +119,11 @@ export const ColorPicker = ({
       setSaturation(nextSaturation || 0);
       setLightness(nextLightness || 0);
       setAlpha((color.alpha() || 1) * 100);
+
+      suppressChangeRef.current = true;
+      lastEmittedValueRef.current =
+        typeof value === 'string' ? value : color.string();
+
       if (typeof value === 'string') {
         if (value.startsWith('rgb')) {
           setMode('rgb');
@@ -134,6 +143,10 @@ export const ColorPicker = ({
   // Notify parent of changes
   useEffect(() => {
     if (onChange) {
+      if (suppressChangeRef.current) {
+        suppressChangeRef.current = false;
+        return;
+      }
       const color = Color.hsl(hue, saturation, lightness).alpha(alpha / 100);
       let formatted = color.string();
 
@@ -152,6 +165,13 @@ export const ColorPicker = ({
           formatted = color.string();
           break;
       }
+
+
+      if (lastEmittedValueRef.current === formatted) {
+        return;
+      }
+
+      lastEmittedValueRef.current = formatted;
 
       onChange(formatted);
     }
@@ -361,8 +381,6 @@ export const ColorPickerOutput = ({
   const { mode, setMode } = useColorPicker();
   return (
     <Select onValueChange={(value) => setMode(value as ColorPickerMode)} value={mode}>
-
-
       <SelectTrigger
         className={cn('h-8 w-20 shrink-0 text-xs', className)}
         {...props}
