@@ -21,7 +21,7 @@ interface RequestOptions {
 type AxiosRequestConfigWithRetry = AxiosRequestConfig & { _retry?: boolean }
 
 interface RefreshResponse {
-  accessToken: string
+  accessToken?: string | null
   refreshToken?: string | null
   user?: User | null
 }
@@ -56,7 +56,7 @@ class AxiosClient {
 
     this.axiosInstance.interceptors.request.use(config => this.attachAuthorizationHeader(config))
     this.axiosInstance.interceptors.response.use(
-      response => response,
+      response => this.handleResponseSuccess(response),
       error => this.handleResponseError(error),
     )
   }
@@ -120,6 +120,17 @@ class AxiosClient {
     return Promise.reject(this.normalizeError(error))
   }
 
+  private handleResponseSuccess<T>(response: AxiosResponse<T>): AxiosResponse<T> {
+    const newAccessToken = this.extractAccessTokenFromHeaders(response.headers)
+
+    if (newAccessToken && newAccessToken !== this.authToken) {
+      this.setAuthTokens(newAccessToken)
+      updateAuthSession({ accessToken: newAccessToken })
+    }
+
+    return response
+  }
+
   private async refreshAccessToken(): Promise<string | null> {
     if (!this.refreshPromise) {
       this.refreshPromise = this.axiosInstance
@@ -129,7 +140,10 @@ class AxiosClient {
           { _retry: true } as AxiosRequestConfigWithRetry,
         )
         .then(response => {
-          const { accessToken, user } = response.data
+          const headerAccessToken = this.extractAccessTokenFromHeaders(response.headers)
+          const { accessToken: bodyAccessToken, user } = response.data
+          const accessToken = headerAccessToken ?? bodyAccessToken
+
           if (!accessToken) {
             throw new Error('Access token not provided by refresh endpoint')
           }
@@ -157,6 +171,42 @@ class AxiosClient {
 
   private mergeHeaders(extraHeaders?: Record<string, string>) {
     return { ...(extraHeaders ?? {}) }
+  }
+
+  private extractAccessTokenFromHeaders(headers: AxiosResponse['headers']): string | null {
+    if (!headers) {
+      return null
+    }
+
+    const normalizedHeaders = headers as Record<string, string | string[] | undefined>
+    const authorizationHeader = this.getFirstHeaderValue(
+      normalizedHeaders['authorization'] ?? normalizedHeaders['Authorization'],
+    )
+    const accessTokenHeader = this.getFirstHeaderValue(
+      normalizedHeaders['x-access-token'] ?? normalizedHeaders['X-Access-Token'],
+    )
+
+    if (authorizationHeader && authorizationHeader.toLowerCase().startsWith('bearer ')) {
+      return authorizationHeader.slice(7).trim() || null
+    }
+
+    if (accessTokenHeader && accessTokenHeader.trim().length > 0) {
+      return accessTokenHeader.trim()
+    }
+
+    return null
+  }
+
+  private getFirstHeaderValue(value: string | string[] | undefined): string | null {
+    if (!value) {
+      return null
+    }
+
+    if (Array.isArray(value)) {
+      return value.find(item => typeof item === 'string' && item.trim().length > 0)?.trim() ?? null
+    }
+
+    return typeof value === 'string' ? value.trim() : null
   }
 
   private normalizeError(error: unknown): Error {
