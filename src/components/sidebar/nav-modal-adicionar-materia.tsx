@@ -19,6 +19,7 @@ import {
     ColorPickerSelection,
 } from "@/components/color-picker";
 
+
 const DEFAULT_COLOR = "#000000";
 
 const materiaFormSchema = z.object({
@@ -148,6 +149,7 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
                                                                         );
                                                                         field.onChange(nextColor);
                                                                     }
+                                                                    field.onChange(nextColor);
                                                                 }}
                                                                 className="gap-4"
                                                             >

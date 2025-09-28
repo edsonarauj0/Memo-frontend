@@ -112,10 +112,42 @@ export const ColorPicker = ({
   const suppressChangeRef = useRef(false);
   const lastEmittedValueRef = useRef<string | null>(null);
 
+
   // Update color when controlled value changes
   useEffect(() => {
     if (!value) {
       return;
+    }
+
+    try {
+      const color = Color(value);
+      const [nextHue, nextSaturation, nextLightness] = color
+        .hsl()
+        .array();
+
+      setHue(nextHue || 0);
+      setSaturation(nextSaturation || 0);
+      setLightness(nextLightness || 0);
+      setAlpha((color.alpha() || 1) * 100);
+
+      suppressChangeRef.current = true;
+      lastEmittedValueRef.current =
+        typeof value === 'string' ? value : color.string();
+
+      if (typeof value === 'string') {
+        if (value.startsWith('rgb')) {
+          setMode('rgb');
+        } else if (value.startsWith('hsl')) {
+          setMode('hsl');
+        } else if (value.startsWith('#')) {
+          setMode('hex');
+        } else {
+          setMode('css');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to parse color value in ColorPicker:', error);
+
     }
 
     try {
