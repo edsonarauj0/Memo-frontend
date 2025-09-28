@@ -104,29 +104,31 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
                                     <FormItem>
                                         <FormLabel>Cor da matéria</FormLabel>
                                         <FormControl>
-                                            <div className="flex items-center gap-4">
-                                                {/* Botão para abrir o ColorPicker */}
-                                                <Button
-                                                    type="button"
-                                                    className="w-10 h-10 p-0 border"
-                                                    style={{ backgroundColor: selectedColor }}
-                                                    onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
-                                                />
-                                                <span>{selectedColor}</span>
-                                            </div>
-                                            {/* ColorPicker */}
-                                            {isColorPickerOpen && (
-                                                <div className="mt-4">
-                                                    <ColorPicker
-                                                        value={selectedColor}
-                                                        onChange={(color) => {
-                                                            const formattedColor = `rgba(${color.join(",")})`; // Formatando a cor corretamente
-                                                            setSelectedColor(formattedColor);
-                                                            field.onChange(formattedColor); // Atualizando o valor do campo
-                                                        }}
+                                            <div className="space-y-4">
+                                                <div className="flex items-center gap-4">
+                                                    {/* Botão para abrir o ColorPicker */}
+                                                    <Button
+                                                        type="button"
+                                                        className="w-10 h-10 p-0 border"
+                                                        style={{ backgroundColor: selectedColor }}
+                                                        onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
                                                     />
+                                                    <span>{selectedColor}</span>
                                                 </div>
-                                            )}
+                                                {/* ColorPicker */}
+                                                {isColorPickerOpen && (
+                                                    <div className="mt-4">
+                                                        <ColorPicker
+                                                            value={selectedColor}
+                                                            onChange={(color) => {
+                                                                const formattedColor = `rgba(${color.join(",")})`; // Formatando a cor corretamente
+                                                                setSelectedColor(formattedColor);
+                                                                field.onChange(formattedColor); // Atualizando o valor do campo
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
