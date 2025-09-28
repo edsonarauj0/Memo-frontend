@@ -10,7 +10,7 @@ export function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route
-        path="/projeto/:id"
+        path="/projeto/:projetoId"
         element={
           <ProtectedRoute>
             <ProjetoPage />
@@ -18,7 +18,7 @@ export function AppRoutes() {
         }
       />
       <Route
-        path="/projeto/:id/materias"
+        path="/projeto/:projetoId/materias"
         element={
           <ProtectedRoute>
             <Materia />

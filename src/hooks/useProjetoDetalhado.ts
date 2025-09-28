@@ -15,7 +15,7 @@ function isValidProjetoId(id?: string): id is string {
 }
 
 export function useProjetoDetalhado() {
-  const { id } = useParams<{ id: string }>()
+  const { projetoId } = useParams<{ projetoId: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
   const [projeto, setProjeto] = useState<ProjetoDetalhado | null>(null)
@@ -23,12 +23,12 @@ export function useProjetoDetalhado() {
   const [erro, setErro] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!isValidProjetoId(id)) {
+    if (!isValidProjetoId(projetoId)) {
       navigate(`/projeto/${DEFAULT_PROJETO_ID}`, { replace: true })
       return
     }
 
-    const numericId = Number(id)
+    const numericId = Number(projetoId)
 
     if (user?.projetos && user.projetos.length > 0) {
       const projetoExiste = user.projetos.some(projetoAtual => projetoAtual.id === numericId)
@@ -73,7 +73,7 @@ export function useProjetoDetalhado() {
     return () => {
       ativo = false
     }
-  }, [id, navigate, user?.projetos])
+  }, [projetoId, navigate, user?.projetos])
 
   return { projeto, isLoading, erro }
 }
