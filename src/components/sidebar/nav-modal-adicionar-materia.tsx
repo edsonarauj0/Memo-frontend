@@ -132,16 +132,9 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
                                                         <div className="space-y-4 rounded-md border border-border p-4">
                                                             <ColorPicker
                                                                 value={currentColor}
-                                                                onChange={(color) => {
-                                                                    const [r = 0, g = 0, b = 0, a = 1] = color as [
-                                                                        number,
-                                                                        number,
-                                                                        number,
-                                                                        number?,
-                                                                    ];
-                                                                    const alpha = Math.round(((a ?? 1) * 100)) / 100;
-                                                                    const formattedColor = `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${alpha})`;
-                                                                    field.onChange(formattedColor);
+
+                                                                onChange={(nextColor) => {
+                                                                    field.onChange(nextColor);
                                                                 }}
                                                                 className="gap-4"
                                                             >
@@ -165,7 +158,6 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
                                         </FormItem>
                                     );
                                 }}
-
                             />
                         </div>
                         <DialogFooter>
