@@ -23,17 +23,19 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+type ColorPickerMode = 'hex' | 'rgb' | 'css' | 'hsl';
+
 interface ColorPickerContextValue {
   hue: number;
   saturation: number;
   lightness: number;
   alpha: number;
-  mode: string;
+  mode: ColorPickerMode;
   setHue: (hue: number) => void;
   setSaturation: (saturation: number) => void;
   setLightness: (lightness: number) => void;
   setAlpha: (alpha: number) => void;
-  setMode: (mode: string) => void;
+  setMode: (mode: ColorPickerMode) => void;
 }
 const ColorPickerContext = createContext<ColorPickerContextValue | undefined>(
   undefined
@@ -48,50 +50,129 @@ export const useColorPicker = () => {
 export type ColorPickerProps = HTMLAttributes<HTMLDivElement> & {
   value?: Parameters<typeof Color>[0];
   defaultValue?: Parameters<typeof Color>[0];
-  onChange?: (value: Parameters<typeof Color.rgb>[0]) => void;
+  onChange?: (value: string) => void;
 };
 export const ColorPicker = ({
   value,
   defaultValue = '#000000',
   onChange,
   className,
+  children,
   ...props
 }: ColorPickerProps) => {
-  const selectedColor = Color(value || defaultValue); // Garantir que sempre haja um valor válido
-  const defaultColor = Color(defaultValue);
+  const fallbackColor = useMemo(() => {
+    try {
+      return Color(defaultValue);
+    } catch (error) {
+      console.error('Invalid default color provided to ColorPicker:', error);
+      return Color('#000000');
+    }
+  }, [defaultValue]);
+
+  const selectedColor = useMemo(() => {
+    try {
+      return value ? Color(value) : fallbackColor;
+    } catch (error) {
+      console.error('Invalid color value provided to ColorPicker:', error);
+      return fallbackColor;
+    }
+  }, [value, fallbackColor]);
   const [hue, setHue] = useState(
-    selectedColor.hue() || defaultColor.hue() || 0
+    selectedColor.hue() || fallbackColor.hue() || 0
   );
   const [saturation, setSaturation] = useState(
-    selectedColor.saturationl() || defaultColor.saturationl() || 100
+    selectedColor.saturationl() || fallbackColor.saturationl() || 100
   );
   const [lightness, setLightness] = useState(
-    selectedColor.lightness() || defaultColor.lightness() || 50
+    selectedColor.lightness() || fallbackColor.lightness() || 50
   );
   const [alpha, setAlpha] = useState(
-    (selectedColor.alpha() || defaultColor.alpha()) * 100 || 100 // Garantir que alpha seja sempre um número válido
+    (selectedColor.alpha() || fallbackColor.alpha()) * 100 || 100
   );
-  const [mode, setMode] = useState('hex');
+  const inferMode = useCallback((input?: Parameters<typeof Color>[0]) => {
+    if (!input || typeof input !== 'string') {
+      return 'hex';
+    }
+    if (input.startsWith('rgb')) return 'rgb';
+    if (input.startsWith('hsl')) return 'hsl';
+    if (input.startsWith('#')) return 'hex';
+    return 'css';
+  }, []);
+
+  const [mode, setModeState] = useState<ColorPickerMode>(() => inferMode(value));
+  const modeDirtyRef = useRef(false);
+  const setMode = useCallback(
+    (nextMode: ColorPickerMode) => {
+      modeDirtyRef.current = true;
+      setModeState(nextMode);
+    },
+    []
+  );
+
+  const suppressChangeRef = useRef(false);
+  const lastEmittedValueRef = useRef<string | null>(null);
 
   // Update color when controlled value changes
   useEffect(() => {
-    if (value) {
-      const color = Color.rgb(value).rgb().object();
-      setHue(color.r || 0);
-      setSaturation(color.g || 0);
-      setLightness(color.b || 0);
-      setAlpha((color.a || 1) * 100); // Garantir que alpha seja sempre um número válido
+    if (!value) {
+      return;
     }
-  }, [value]);
+
+    try {
+      const color = Color(value);
+      const [nextHue, nextSaturation, nextLightness] = color
+        .hsl()
+        .array();
+
+      setHue(nextHue || 0);
+      setSaturation(nextSaturation || 0);
+      setLightness(nextLightness || 0);
+      setAlpha((color.alpha() || 1) * 100);
+      suppressChangeRef.current = true;
+      lastEmittedValueRef.current =
+        typeof value === 'string' ? value : color.string();
+      if (!modeDirtyRef.current) {
+        setModeState(inferMode(value));
+      }
+    } catch (error) {
+      console.error('Failed to parse color value in ColorPicker:', error);
+    }
+  }, [value, inferMode]);
 
   // Notify parent of changes
   useEffect(() => {
     if (onChange) {
+      if (suppressChangeRef.current) {
+        suppressChangeRef.current = false;
+        return;
+      }
       const color = Color.hsl(hue, saturation, lightness).alpha(alpha / 100);
-      const rgba = color.rgb().array();
-      onChange([rgba[0], rgba[1], rgba[2], alpha / 100]);
+      let formatted = color.string();
+
+      switch (mode) {
+        case 'hex':
+          formatted = alpha === 100 ? color.hex() : color.hexa();
+          break;
+        case 'rgb':
+          formatted = color.rgb().string();
+          break;
+        case 'hsl':
+          formatted = color.hsl().string();
+          break;
+        case 'css':
+        default:
+          formatted = color.string();
+          break;
+      }
+
+      if (lastEmittedValueRef.current === formatted) {
+        return;
+      }
+
+      lastEmittedValueRef.current = formatted;
+      onChange(formatted);
     }
-  }, [hue, saturation, lightness, alpha, onChange]);
+  }, [hue, saturation, lightness, alpha, mode, onChange]);
 
   return (
     <ColorPickerContext.Provider
@@ -111,7 +192,9 @@ export const ColorPicker = ({
       <div
         className={cn('flex size-full flex-col gap-4', className)}
         {...props}
-      />
+      >
+        {children}
+      </div>
     </ColorPickerContext.Provider>
   );
 };
@@ -122,7 +205,13 @@ export const ColorPickerSelection = memo(
     const [isDragging, setIsDragging] = useState(false);
     const [positionX, setPositionX] = useState(0);
     const [positionY, setPositionY] = useState(0);
-    const { hue, setSaturation, setLightness } = useColorPicker();
+    const {
+      hue,
+      saturation,
+      lightness,
+      setSaturation,
+      setLightness,
+    } = useColorPicker();
     const backgroundGradient = useMemo(() => {
       return `linear-gradient(0deg, rgba(0,0,0,1), rgba(0,0,0,0)),
             linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0)),
@@ -145,12 +234,18 @@ export const ColorPickerSelection = memo(
         setPositionX(x);
         setPositionY(y);
         setSaturation(x * 100);
-        const topLightness = x < 0.01 ? 100 : 50 + 50 * (1 - x);
-        const lightness = topLightness * (1 - y);
-        setLightness(lightness);
+        setLightness(100 - y * 100);
       },
       [isDragging, setSaturation, setLightness]
     );
+    useEffect(() => {
+      if (isDragging) {
+        return;
+      }
+
+      setPositionX(saturation / 100);
+      setPositionY(1 - lightness / 100);
+    }, [isDragging, saturation, lightness]);
     useEffect(() => {
       const handlePointerUp = () => setIsDragging(false);
       if (isDragging) {
@@ -275,15 +370,18 @@ export const ColorPickerEyeDropper = ({
   );
 };
 export type ColorPickerOutputProps = ComponentProps<typeof SelectTrigger>;
-const formats = ['hex', 'rgb', 'css', 'hsl'];
+const formats: ColorPickerMode[] = ['hex', 'rgb', 'css', 'hsl'];
 export const ColorPickerOutput = ({
   className,
   ...props
 }: ColorPickerOutputProps) => {
   const { mode, setMode } = useColorPicker();
   return (
-    <Select onValueChange={setMode} value={mode}>
-      <SelectTrigger className="h-8 w-20 shrink-0 text-xs" {...props}>
+    <Select onValueChange={(value) => setMode(value as ColorPickerMode)} value={mode}>
+      <SelectTrigger
+        className={cn('h-8 w-20 shrink-0 text-xs', className)}
+        {...props}
+      >
         <SelectValue placeholder="Mode" />
       </SelectTrigger>
       <SelectContent>
