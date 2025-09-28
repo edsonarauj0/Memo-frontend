@@ -22,11 +22,6 @@ export type ProjetoDetalhado = Projeto & {
   materias: Materia[] | null
 }
 
-export interface CreateMateriaPayload {
-  nome: string
-  cor: string | undefined
-}
-
 export async function createProjeto(payload: CreateProjetoPayload): Promise<CreateProjetoResponse> {
   return httpClient.post<CreateProjetoResponse>({
     url: "/projeto",
@@ -44,12 +39,5 @@ export async function selecionarProjeto(payload: SelectProjetoPayload): Promise<
 export async function buscarProjetoPorId(projetoId: number): Promise<ProjetoDetalhado> {
   return httpClient.get<ProjetoDetalhado>({
     url: `/projeto/${projetoId}`,
-  })
-}
-
-export async function adicionarMateria(projetoId: number, payload: CreateMateriaPayload): Promise<Materia> {
-  return httpClient.post<Materia>({
-    url: `/projeto/${projetoId}/materias`,
-    data: payload,
   })
 }

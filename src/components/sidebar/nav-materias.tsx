@@ -8,14 +8,14 @@ import React from "react"
 
 export function NavMaterias() {
   const navigate = useNavigate()
-  const { id } = useParams<{ id?: string }>()
+  const { projetoId } = useParams<{ projetoId?: string }>()
   const { isMobile } = useSidebar()
 
   const [abrirModalAdicionarMateria, setAbrirModalAdicionarMateria] = React.useState<boolean>(false);
 
   const handleVerMaterias = () => {
-    const projetoId = id ?? String(DEFAULT_PROJETO_ID)
-    navigate(`/projeto/${projetoId}/materias`)
+    const id = projetoId ?? String(DEFAULT_PROJETO_ID)
+    navigate(`/projeto/${id}/materias`)
   }
   return (
     <>

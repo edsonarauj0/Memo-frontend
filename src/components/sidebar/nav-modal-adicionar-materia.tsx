@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
-import { adicionarMateria } from "@/api/projeto";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useForm } from "react-hook-form";
@@ -18,6 +17,7 @@ import {
     ColorPickerOutput,
     ColorPickerSelection,
 } from "@/components/color-picker";
+import { adicionarMateria } from "@/api/materia";
 
 
 const DEFAULT_COLOR = "#000000";
@@ -65,7 +65,7 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
         try {
             await adicionarMateria(Number(projetoId), {
                 nome: values.nome,
-                cor: values.cor, // Incluindo a cor no envio
+                cor: values.cor,
             });
 
             const currentPath = window.location.pathname;
@@ -75,6 +75,7 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
                 navigate(materiasPath);
             }
             toast.success("Matéria criada com sucesso!");
+            window.location.reload()
             onOpenChange(false);
         } catch (error) {
             const message = error instanceof Error ? error.message : "Não foi possível criar a matéria.";
