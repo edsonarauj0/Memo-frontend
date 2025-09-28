@@ -361,6 +361,8 @@ export const ColorPickerOutput = ({
   const { mode, setMode } = useColorPicker();
   return (
     <Select onValueChange={(value) => setMode(value as ColorPickerMode)} value={mode}>
+
+
       <SelectTrigger
         className={cn('h-8 w-20 shrink-0 text-xs', className)}
         {...props}

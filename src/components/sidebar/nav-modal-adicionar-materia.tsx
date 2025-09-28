@@ -132,6 +132,7 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
                                                         <div className="space-y-4 rounded-md border border-border p-4">
                                                             <ColorPicker
                                                                 value={currentColor}
+
                                                                 onChange={(nextColor) => {
                                                                     field.onChange(nextColor);
                                                                 }}
