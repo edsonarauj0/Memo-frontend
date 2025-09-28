@@ -55,6 +55,7 @@ export const ColorPicker = ({
   defaultValue = '#000000',
   onChange,
   className,
+  children,
   ...props
 }: ColorPickerProps) => {
   const selectedColor = Color(value || defaultValue); // Garantir que sempre haja um valor válido
@@ -111,7 +112,9 @@ export const ColorPicker = ({
       <div
         className={cn('flex size-full flex-col gap-4', className)}
         {...props}
-      />
+      >
+        {children}
+      </div>
     </ColorPickerContext.Provider>
   );
 };
@@ -283,7 +286,10 @@ export const ColorPickerOutput = ({
   const { mode, setMode } = useColorPicker();
   return (
     <Select onValueChange={setMode} value={mode}>
-      <SelectTrigger className="h-8 w-20 shrink-0 text-xs" {...props}>
+      <SelectTrigger
+        className={cn('h-8 w-20 shrink-0 text-xs', className)}
+        {...props}
+      >
         <SelectValue placeholder="Mode" />
       </SelectTrigger>
       <SelectContent>
