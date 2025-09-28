@@ -102,6 +102,7 @@ export const ColorPicker = ({
   const suppressChangeRef = useRef(false);
   const lastEmittedValueRef = useRef<string | null>(null);
 
+
   // Update color when controlled value changes
   useEffect(() => {
     if (!value) {
@@ -118,9 +119,11 @@ export const ColorPicker = ({
       setSaturation(nextSaturation || 0);
       setLightness(nextLightness || 0);
       setAlpha((color.alpha() || 1) * 100);
+
       suppressChangeRef.current = true;
       lastEmittedValueRef.current =
         typeof value === 'string' ? value : color.string();
+
       if (typeof value === 'string') {
         if (value.startsWith('rgb')) {
           setMode('rgb');
@@ -163,11 +166,13 @@ export const ColorPicker = ({
           break;
       }
 
+
       if (lastEmittedValueRef.current === formatted) {
         return;
       }
 
       lastEmittedValueRef.current = formatted;
+
       onChange(formatted);
     }
   }, [hue, saturation, lightness, alpha, mode, onChange]);
