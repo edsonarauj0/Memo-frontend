@@ -1,3 +1,4 @@
+import Color from "color";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -18,7 +19,8 @@ import {
     ColorPickerSelection,
 } from "@/components/color-picker";
 
-const DEFAULT_COLOR = "rgba(0,0,0,1)";
+
+const DEFAULT_COLOR = "#000000";
 
 const materiaFormSchema = z.object({
     nome: z.string().min(1, "O nome é obrigatório"),
@@ -133,6 +135,20 @@ export function ModalAdicionarMateria({ open, onOpenChange }: { open: boolean; o
                                                             <ColorPicker
                                                                 value={currentColor}
                                                                 onChange={(nextColor) => {
+                                                                    try {
+                                                                        const color = Color(nextColor);
+                                                                        const normalizedColor =
+                                                                            color.alpha() < 1
+                                                                                ? color.hexa()
+                                                                                : color.hex();
+                                                                        field.onChange(normalizedColor);
+                                                                    } catch (error) {
+                                                                        console.error(
+                                                                            "Falha ao converter a cor para hexadecimal:",
+                                                                            error,
+                                                                        );
+                                                                        field.onChange(nextColor);
+                                                                    }
                                                                     field.onChange(nextColor);
                                                                 }}
                                                                 className="gap-4"

@@ -89,15 +89,25 @@ export const ColorPicker = ({
   const [alpha, setAlpha] = useState(
     (selectedColor.alpha() || fallbackColor.alpha()) * 100 || 100
   );
-  const [mode, setMode] = useState<ColorPickerMode>(() => {
-    if (!value || typeof value !== 'string') {
+  const inferMode = useCallback((input?: Parameters<typeof Color>[0]) => {
+    if (!input || typeof input !== 'string') {
       return 'hex';
     }
-    if (value.startsWith('rgb')) return 'rgb';
-    if (value.startsWith('hsl')) return 'hsl';
-    if (value.startsWith('#')) return 'hex';
+    if (input.startsWith('rgb')) return 'rgb';
+    if (input.startsWith('hsl')) return 'hsl';
+    if (input.startsWith('#')) return 'hex';
     return 'css';
-  });
+  }, []);
+
+  const [mode, setModeState] = useState<ColorPickerMode>(() => inferMode(value));
+  const modeDirtyRef = useRef(false);
+  const setMode = useCallback(
+    (nextMode: ColorPickerMode) => {
+      modeDirtyRef.current = true;
+      setModeState(nextMode);
+    },
+    []
+  );
 
   const suppressChangeRef = useRef(false);
   const lastEmittedValueRef = useRef<string | null>(null);
@@ -137,8 +147,29 @@ export const ColorPicker = ({
       }
     } catch (error) {
       console.error('Failed to parse color value in ColorPicker:', error);
+
     }
-  }, [value]);
+
+    try {
+      const color = Color(value);
+      const [nextHue, nextSaturation, nextLightness] = color
+        .hsl()
+        .array();
+
+      setHue(nextHue || 0);
+      setSaturation(nextSaturation || 0);
+      setLightness(nextLightness || 0);
+      setAlpha((color.alpha() || 1) * 100);
+      suppressChangeRef.current = true;
+      lastEmittedValueRef.current =
+        typeof value === 'string' ? value : color.string();
+      if (!modeDirtyRef.current) {
+        setModeState(inferMode(value));
+      }
+    } catch (error) {
+      console.error('Failed to parse color value in ColorPicker:', error);
+    }
+  }, [value, inferMode]);
 
   // Notify parent of changes
   useEffect(() => {
@@ -166,13 +197,11 @@ export const ColorPicker = ({
           break;
       }
 
-
       if (lastEmittedValueRef.current === formatted) {
         return;
       }
 
       lastEmittedValueRef.current = formatted;
-
       onChange(formatted);
     }
   }, [hue, saturation, lightness, alpha, mode, onChange]);
